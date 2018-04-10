@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
+#include <string>
 
 #if defined(_WIN32)
 #include <direct.h>

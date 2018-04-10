@@ -26,7 +26,7 @@ namespace core{
         return current_working_dir;
     }
 
-    inline void CreateCmakeListsFile(){
+    inline void CreateMainCmakeListsFile(){
         std::ofstream outfile("CMakeLists.txt");
         outfile 
             << "cmake_minimum_required (VERSION 3.9)"
@@ -36,6 +36,32 @@ namespace core{
             << "\n\nif (MSVC)"
             << "\n\tset(EXECUTABLE_OUTPUT_PATH bin/)"
             << "\nendif (MSVC)";
+        outfile.close();
+    }
+
+    inline void CreateSecondaryCMakeListsFile(const std::string& path, const std::string& project_name){
+        std::ofstream outfile(path + "/CMakeLists.txt");
+        outfile
+            << "project(" << project_name << ")"
+            << "\n\nset(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})"
+            << "\n\nfile (GLOB_RECURSE source_files ./*)"
+            << "\n\nadd_executable (" << project_name << " ${source_files})";
+        outfile.close();
+    }
+
+    inline void CreateTestCMakeListsFile(const std::string& path, const std::string& project_name){
+        std::ofstream outfile(path + "/CMakeLists.txt");
+        outfile
+            << "project(" << "test_" << project_name << ")"
+            << "\n\nset(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})"
+            << "\n\nfile (GLOB_RECURSE testing_files ./*)"
+            << "\nfile (GLOB_RECURSE testing_source_files ../src/*)"
+            << "\n\nFOREACH(item ${testing_source_files})"
+            << "\n\tIF(${item} MATCHES \"main.cc\")"
+            << "\n\t\tLIST(REMOVE_ITEM testing_source_files ${item})"
+            << "\n\tENDIF(${item} MATCHES \"main.cc\")"
+            << "\nENDFOREACH(item)"
+            << "\n\nadd_executable (test_" << project_name << " ${testing_files} ${testing_source_files})";
         outfile.close();
     }
 
@@ -61,7 +87,7 @@ namespace core{
             error = mkdir(folder_name, mode); // can be used on Unix
         #endif
         if (error != 0) {
-            std::cout << "\t# [ERROR] Can't create the " << folder_name << " folder.\n";
+            std::cout << "\t# [ERROR] Can't create the " << folder_name << " folder. (already exists)\n";
         }else{
             std::cout << "\t# [SUCCESS] The " << folder_name << " folder is created.\n";
         }
