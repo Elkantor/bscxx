@@ -39,13 +39,30 @@ namespace core{
         outfile.close();
     }
 
-    inline void CreateSecondaryCMakeListsFile(const std::string& path, const std::string& project_name){
+    inline void CreateSecondaryCMakeListsFile(
+        const std::string& path, 
+        const std::string& project_name, 
+        const ProjectType project_type = ProjectType::EXECUTABLE
+    ){
+        std::string type_project;
         std::ofstream outfile(path + "/CMakeLists.txt");
+
+        switch(project_type){
+            case DYNAMIC_LIBRARY:
+                type_project = "add_library (" + project_name + " SHARED ${source_files})";
+                break;
+            case STATIC_LIBRARY:
+                type_project = "add_library (" + project_name + " STATIC ${source_files})";
+                break;
+            default:
+                type_project = "add_executable (" + project_name + " ${source_files})";
+                break;
+        }
         outfile
             << "project(" << project_name << ")"
             << "\n\nset(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})"
             << "\n\nfile (GLOB_RECURSE source_files ./*)"
-            << "\n\nadd_executable (" << project_name << " ${source_files})";
+            << "\n\n" << type_project;
         outfile.close();
     }
 

@@ -18,7 +18,17 @@ int main(int argc, char* argv[]){
                 core::CreateFolder("lib");
                 core::CreateFolder("test");
                 core::CreateMainFile();
-                core::CreateSecondaryCMakeListsFile("./src", argv[2]);
+                if(argv[3] != nullptr){
+                    if(strcmp(argv[3], "--dynamic_lib") == 0 || strcmp(argv[3], "-dl") == 0){
+                        core::CreateSecondaryCMakeListsFile("./src", argv[2], core::ProjectType::DYNAMIC_LIBRARY);
+                    }else if(strcmp(argv[3], "--static_lib") == 0 || strcmp(argv[3], "-sl") == 0){
+                        core::CreateSecondaryCMakeListsFile("./src", argv[2], core::ProjectType::STATIC_LIBRARY);
+                    }else{
+                        core::CreateSecondaryCMakeListsFile("./src", argv[2]);
+                    }
+                }else{
+                    core::CreateSecondaryCMakeListsFile("./src", argv[2]);
+                }
                 core::CreateTestCMakeListsFile("./test", argv[2]);
             }
         }
