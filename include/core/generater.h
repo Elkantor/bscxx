@@ -145,8 +145,8 @@ namespace core{
         infile.close();
 
         std::ofstream outfile("./CMakeLists.txt");
-        for(const auto& line : lines){
-            outfile << line << "\n";
+        for(int i = 0; i < lines.size(); i++){
+            outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
         outfile.close();
     }
@@ -187,8 +187,8 @@ namespace core{
         infile.close();
 
         std::ofstream outfile("./src/CMakeLists.txt");
-        for(const auto& line : lines){
-            outfile << line << "\n";
+        for(int i = 0; i < lines.size(); i++){
+            outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
         outfile.close();
     }
