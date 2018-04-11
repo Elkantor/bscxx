@@ -154,6 +154,7 @@ namespace core{
     inline void AddModuleSourceFilesToSecondaryCmakeListsFile(const std::string& module_name, const std::string& source_folder){
         std::vector<std::string> lines;
         std::string line;
+        std::string project_name;
         
         std::ifstream infile("./" + source_folder + "/CMakeLists.txt", std::ios::in);
         if (!infile) {
@@ -165,8 +166,8 @@ namespace core{
         while(!infile.eof()){
             std::getline(infile, line);
             if(line.compare("## End of adding source files ##") == 0){
-                if(lines.at(lines.size() - 1).compare("\tfile (GLOB_RECURSE" + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*") != 0){
-                    lines.emplace_back("\tfile (GLOB_RECURSE" + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*");
+                if(lines.at(lines.size() - 1).compare("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*)") != 0){
+                    lines.emplace_back("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*)");
                 }
                 lines.emplace_back("## End of adding source files ##");
             }else if(line.compare("## End of removing main.cc files of modules ##") == 0){
@@ -180,6 +181,15 @@ namespace core{
                     }
                 }
                 lines.emplace_back("## End of removing main.cc files of modules ##");
+            }else if(line.compare("## End of adding executables ##") == 0){
+                std::string previous_line = lines.at(lines.size() -1);
+                std::size_t found_module = previous_line.find("${" + module_name + "_source_files}");
+                if(found_module == std::string::npos){ 
+                    std::size_t project_source_found = previous_line.find("})");
+                    std::string new_line = previous_line.substr(0, project_source_found) + "} " + "${" + module_name + "_source_files})";
+                    lines.at(lines.size() - 1) = new_line;
+                }
+                lines.emplace_back("## End of adding executables ##");
             }else{
                 lines.emplace_back(line);
             }
