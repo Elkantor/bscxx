@@ -31,11 +31,15 @@ namespace core{
         outfile 
             << "cmake_minimum_required (VERSION 3.9)"
             << "\n\n## Include libraries ##"
-            << "\ninclude_directories (\"${PROJECT_BINARY_DIR}/../include\")"
-            << "\nset(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})"
+            << "\n\tinclude_directories (\"${PROJECT_BINARY_DIR}/../include\")"
+            << "\n## End of include libraries ##"
+            << "\n\nset(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})"
             << "\n\nif (MSVC)"
             << "\n\tset(EXECUTABLE_OUTPUT_PATH bin/)"
-            << "\nendif (MSVC)";
+            << "\nendif (MSVC)"
+            << "\n\n## Add executables ##"
+            << "\n\tadd_subdirectory (src)"
+            << "\n## End of adding executables ##";
         outfile.close();
     }
 
@@ -61,7 +65,9 @@ namespace core{
         outfile
             << "project(" << project_name << ")"
             << "\n\nset(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})"
-            << "\n\nfile (GLOB_RECURSE source_files ./*)"
+            << "\n\n## Add source files ##"
+            << "\n\tfile (GLOB_RECURSE source_files ./*)"
+            << "\n## End of adding source files ##"
             << "\n\n" << type_project;
         outfile.close();
     }
@@ -71,19 +77,23 @@ namespace core{
         outfile
             << "project(" << "test_" << project_name << ")"
             << "\n\nset(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})"
-            << "\n\nfile (GLOB_RECURSE testing_files ./*)"
-            << "\nfile (GLOB_RECURSE testing_source_files ../src/*)"
+            << "\n\n## Add source files ##"
+            << "\n\tfile (GLOB_RECURSE testing_files ./*)"
+            << "\n\tfile (GLOB_RECURSE testing_source_files ../src/*)"
+            << "\n## End of adding executables ##"
             << "\n\nFOREACH(item ${testing_source_files})"
             << "\n\tIF(${item} MATCHES \"main.cc\")"
             << "\n\t\tLIST(REMOVE_ITEM testing_source_files ${item})"
             << "\n\tENDIF(${item} MATCHES \"main.cc\")"
             << "\nENDFOREACH(item)"
-            << "\n\nadd_executable (test_" << project_name << " ${testing_files} ${testing_source_files})";
+            << "\n\n## Add executables ##"
+            << "\n\tadd_executable (test_" << project_name << " ${testing_files} ${testing_source_files})"
+            << "\n\n## End of adding executables ##";
         outfile.close();
     }
 
-    inline void CreateMainFile(){
-        std::ofstream outfile("src/main.cc");
+    inline void CreateMainFile(const std::string& path){
+        std::ofstream outfile(path + "/main.cc");
         outfile 
             << "#pragma once"
             << "\n\n#include <iostream>"
@@ -91,22 +101,55 @@ namespace core{
             << "\n\tstd::cout << \"test\" << std::endl;"
             << "\n\n\treturn 0;"
             << "\n}";
-
         outfile.close();
     }
 
-    inline void CreateFolder(const char* folder_name){
+    inline void CreateFolder(const std::string& path){
         int error = 0;
         #if defined(_WIN32)
-            error = _mkdir(folder_name); // can be used on Windows
+            error = _mkdir(path.c_str()); // can be used on Windows
         #else 
             mode_t mode = 0733;
-            error = mkdir(folder_name, mode); // can be used on Unix
+            error = mkdir(path.c_str(), mode); // can be used on Unix
         #endif
         if (error != 0) {
-            std::cout << "\t# [ERROR] Can't create the " << folder_name << " folder. (already exists)\n";
+            std::cout << "\t# [ERROR] Can't create the " << path << " folder. (already exists)\n";
         }else{
-            std::cout << "\t# [SUCCESS] The " << folder_name << " folder is created.\n";
+            std::cout << "\t# [SUCCESS] The " << path << " folder is created.\n";
+        }
+    }
+
+    inline void AddModuleHeadersToMainCMakeListsFile(const std::string& path_module){
+        std::vector<std::string> lines;
+        std::string line;
+        std::ifstream infile("./CMakeLists.txt", std::ios::in);
+        if (!infile) {
+            std::cerr << "Could not open the main CMakeLists.txt file\n";
+            return;
+        }
+
+        while(!infile.eof()){
+            std::getline(infile, line);
+            if(line.compare("## End of include libraries ##") == 0){
+                lines.emplace_back("\tinclude_directories (\"${PROJECT_BINARY_DIR}/../" + path_module + "/include\")");
+            }
+            lines.emplace_back(line);
+        }
+
+        std::ofstream outfile("./CMakeLists.txt");
+        for(const auto& line : lines){
+            outfile << "\n" << line;
+        }
+        outfile.close();
+    }
+
+    inline void AddModuleSourceFilesToSecondariesCmakeListsFiles(const std::string& path_module){
+        std::vector<std::string> lines;
+        std::string line;
+        std::ifstream infile("./CMakeLists.txt", std::ios::in);
+        if (!infile) {
+            std::cerr << "Could not open the main CMakeLists.txt file\n";
+            return;
         }
     }
 

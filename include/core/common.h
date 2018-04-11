@@ -4,11 +4,12 @@
 #include <fstream>
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 #if defined(_WIN32)
-#include <direct.h>
-#define GetCurrentDir _getcwd
+    #include <direct.h>
+    #define GetCurrentDir _getcwd
 #else
-#include <unistd.h>
-#define GetCurrentDir getcwd
+    #include <unistd.h>
+    #define GetCurrentDir getcwd
 #endif
