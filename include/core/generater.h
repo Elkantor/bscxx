@@ -26,8 +26,8 @@ namespace core{
         return current_working_dir;
     }
 
-    inline void CreateMainCmakeListsFile(){
-        std::ofstream outfile("CMakeLists.txt");
+    inline void CreateMainCmakeListsFile(const std::string& path){
+        std::ofstream outfile(path + "CMakeLists.txt");
         outfile 
             << "cmake_minimum_required (VERSION 3.9)"
             << "\n\n## Include libraries ##"
@@ -68,6 +68,8 @@ namespace core{
             << "\n\n## Add source files ##"
             << "\n\tfile (GLOB_RECURSE source_files ./*)"
             << "\n## End of adding source files ##"
+            << "\n\n## Remove main.cc files of modules ##"
+            << "\n## End of removing main.cc files of modules ##"
             << "\n\n" << type_project;
         outfile.close();
     }
@@ -81,11 +83,13 @@ namespace core{
             << "\n\tfile (GLOB_RECURSE testing_files ./*)"
             << "\n\tfile (GLOB_RECURSE testing_source_files ../src/*)"
             << "\n## End of adding executables ##"
-            << "\n\nFOREACH(item ${testing_source_files})"
-            << "\n\tIF(${item} MATCHES \"main.cc\")"
-            << "\n\t\tLIST(REMOVE_ITEM testing_source_files ${item})"
-            << "\n\tENDIF(${item} MATCHES \"main.cc\")"
-            << "\nENDFOREACH(item)"
+            << "\n\n## Remove main.cc files of modules ##"
+            << "\n\tFOREACH(item ${testing_source_files})"
+            << "\n\t\tIF(${item} MATCHES \"main.cc\")"
+            << "\n\t\t\tLIST(REMOVE_ITEM testing_source_files ${item})"
+            << "\n\t\tENDIF(${item} MATCHES \"main.cc\")"
+            << "\n\tENDFOREACH(item)"
+            << "\n## End of removing main.cc files of modules ##"
             << "\n\n## Add executables ##"
             << "\n\tadd_executable (test_" << project_name << " ${testing_files} ${testing_source_files})"
             << "\n\n## End of adding executables ##";
@@ -123,6 +127,7 @@ namespace core{
         std::vector<std::string> lines;
         std::string line;
         std::ifstream infile("./CMakeLists.txt", std::ios::in);
+        
         if (!infile) {
             std::cerr << "Could not open the main CMakeLists.txt file\n";
             return;
@@ -131,26 +136,62 @@ namespace core{
         while(!infile.eof()){
             std::getline(infile, line);
             if(line.compare("## End of include libraries ##") == 0){
-                lines.emplace_back("\tinclude_directories (\"${PROJECT_BINARY_DIR}/../" + path_module + "/include\")");
+                std::cout << lines.at(lines.size() - 1) << std::endl;
+                if(lines.at(lines.size() - 1).compare("\tinclude_directories (\"${PROJECT_BINARY_DIR}/../" + path_module + "/include\")") != 0){
+                    lines.emplace_back("\tinclude_directories (\"${PROJECT_BINARY_DIR}/../" + path_module + "/include\")");
+                }
             }
             lines.emplace_back(line);
         }
+        infile.close();
 
         std::ofstream outfile("./CMakeLists.txt");
         for(const auto& line : lines){
-            outfile << "\n" << line;
+            outfile << line << "\n";
         }
         outfile.close();
     }
 
-    inline void AddModuleSourceFilesToSecondariesCmakeListsFiles(const std::string& path_module){
+    inline void AddModuleSourceFilesToSecondariesCmakeListsFiles(const std::string& module_name){
         std::vector<std::string> lines;
         std::string line;
-        std::ifstream infile("./CMakeLists.txt", std::ios::in);
+        
+        std::ifstream infile("./src/CMakeLists.txt", std::ios::in);
         if (!infile) {
-            std::cerr << "Could not open the main CMakeLists.txt file\n";
+            std::cout << "error !" << std::endl;
+            std::cerr << "Could not open the secondaries (inside src and test folders) CMakeLists.txt files\n";
             return;
         }
+        
+        while(!infile.eof()){
+            std::getline(infile, line);
+            if(line.compare("## End of adding source files ##") == 0){
+                if(lines.at(lines.size() - 1).compare("\tfile (GLOB_RECURSE" + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*") != 0){
+                    lines.emplace_back("\tfile (GLOB_RECURSE" + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*");
+                }
+                lines.emplace_back("## End of adding source files ##");
+            }else if(line.compare("## End of removing main.cc files of modules ##") == 0){
+                if(lines.size() > 5){ 
+                    if(lines.at(lines.size() - 5).compare("\tFOREACH(item ${" + module_name + "_source_files})") != 0){
+                        lines.emplace_back("\tFOREACH(item ${" + module_name + "_source_files})");
+                        lines.emplace_back("\t\tIF(${item} MATCHES \"main.cc\")");
+                        lines.emplace_back("\t\t\tLIST(REMOVE_ITEM testing_source_files ${item})");
+                        lines.emplace_back("\t\tENDIF(${item} MATCHES \"main.cc\")");
+                        lines.emplace_back("\tENDFOREACH(item)");
+                    }
+                }
+                lines.emplace_back("## End of removing main.cc files of modules ##");
+            }else{
+                lines.emplace_back(line);
+            }
+        }
+        infile.close();
+
+        std::ofstream outfile("./src/CMakeLists.txt");
+        for(const auto& line : lines){
+            outfile << line << "\n";
+        }
+        outfile.close();
     }
 
 }// namespace core
