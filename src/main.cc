@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
                 if(strcmp(argv[2], "--new") == 0 || strcmp(argv[2], "-n") == 0){
                     core::CreateFolder("bscxx_modules");
                     core::CreateFolder("bscxx_modules/" + module_name);
-                    core::CreateMainCmakeListsFile("./bscxx_modules/" + module_name);
+                    core::CreateMainCmakeListsFile("./bscxx_modules/" + module_name + "/");
                     core::CreateFolder("bscxx_modules/" + module_name + "/src");
                     core::CreateFolder("bscxx_modules/" + module_name + "/include");
                     core::CreateFolder("bscxx_modules/" + module_name + "/lib");
@@ -69,7 +69,8 @@ int main(int argc, char* argv[]){
             std::cout << "\n\t [Test]";
             std::string module_name = argv[2];
             core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
-            core::AddModuleSourceFilesToSecondariesCmakeListsFiles(module_name);
+            core::AddModuleSourceFilesToSecondaryCmakeListsFile(module_name, "src");
+            //core::AddModuleSourceFilesToSecondaryCmakeListsFile(module_name, "test");
         }
 
         /***********/

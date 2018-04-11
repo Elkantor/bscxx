@@ -14,7 +14,6 @@ namespace core{
         STATIC_LIBRARY
     };
 
-
     /*************/
     /* FUNCTIONS */
     /*************/
@@ -82,7 +81,7 @@ namespace core{
             << "\n\n## Add source files ##"
             << "\n\tfile (GLOB_RECURSE testing_files ./*)"
             << "\n\tfile (GLOB_RECURSE testing_source_files ../src/*)"
-            << "\n## End of adding executables ##"
+            << "\n## End of adding source files ##"
             << "\n\n## Remove main.cc files of modules ##"
             << "\n\tFOREACH(item ${testing_source_files})"
             << "\n\t\tIF(${item} MATCHES \"main.cc\")"
@@ -152,11 +151,11 @@ namespace core{
         outfile.close();
     }
 
-    inline void AddModuleSourceFilesToSecondariesCmakeListsFiles(const std::string& module_name){
+    inline void AddModuleSourceFilesToSecondaryCmakeListsFile(const std::string& module_name, const std::string& source_folder){
         std::vector<std::string> lines;
         std::string line;
         
-        std::ifstream infile("./src/CMakeLists.txt", std::ios::in);
+        std::ifstream infile("./" + source_folder + "/CMakeLists.txt", std::ios::in);
         if (!infile) {
             std::cout << "error !" << std::endl;
             std::cerr << "Could not open the secondaries (inside src and test folders) CMakeLists.txt files\n";
@@ -175,7 +174,7 @@ namespace core{
                     if(lines.at(lines.size() - 5).compare("\tFOREACH(item ${" + module_name + "_source_files})") != 0){
                         lines.emplace_back("\tFOREACH(item ${" + module_name + "_source_files})");
                         lines.emplace_back("\t\tIF(${item} MATCHES \"main.cc\")");
-                        lines.emplace_back("\t\t\tLIST(REMOVE_ITEM testing_source_files ${item})");
+                        lines.emplace_back("\t\t\tLIST(REMOVE_ITEM " + module_name + "_source_files ${item})");
                         lines.emplace_back("\t\tENDIF(${item} MATCHES \"main.cc\")");
                         lines.emplace_back("\tENDFOREACH(item)");
                     }
