@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
                         << "\nAdd a C++ module in the project's dependencies (located in ./bscxx_modules)"
                         << "\n\nUsage: bscxx add [OPTION] [module_name]"
                         << "\n\nOptions:"
-                        << "\n\t--new\t Create a new module skeleton"
+                        << "\n\t--new\t Create a new module's skeleton"
                         << "\n";
                 }
 
@@ -93,8 +93,7 @@ int main(int argc, char* argv[]){
                 if(strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0){
                     std::cout 
                         << "\nRemove a C++ module from the project's dependencies (located in ./bscxx_modules)"
-                        << "\n\nUsage: bscxx remove [OPTION] [module_name]"
-                        << "\n";
+                        << "\nUsage: bscxx remove [module_name]\n";
                 }
 
                 /*******************/
@@ -119,23 +118,23 @@ int main(int argc, char* argv[]){
         /* Show the help */
         /*****************/
         else if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-            std::cout << "\n\nCommands:";
-            std::cout << "\n\ncreate\t\tCreate a new C++ project";
-            std::cout << "\nadd\tAdd a C++ module in the project dependencies (located in ./bscxx_modules)";
-            std::cout << "\nremove\tRemove a C++ module in the project dependencies (located in ./bscxx_modules)";
-            std::cout << "\n";
+            std::cout 
+                << "\n\nCommands:"
+                << "\n\ncreate\t Create a new C++ project"
+                << "\nadd\t Add a C++ module in the project dependencies"
+                << "\nremove\t Remove a C++ module in the project dependencies\n";
         }
 
         /***********/
         /* Default */
         /***********/ 
         else {
-            std::cout << "\n\t# [ERROR] Command not valid.";
-            std::cout << "\n\nHere is the list of all the available commands:";
-            std::cout << "\n\ncreate\t\tCreate a new C++ project";
-            std::cout << "\nadd\tAdd a C++ module in the project dependencies (located in ./bscxx_modules)";
-            std::cout << "\nremove\tRemove a C++ module in the project dependencies (located in ./bscxx_modules)";
-            std::cout << "\n";
+            std::cout 
+                << "\n\t# [ERROR] Command not valid."
+                << "\n\nHere is the list of all the available commands:"
+                << "\n\ncreate\t Create a new C++ project"
+                << "\nadd\t Add a C++ module in the project dependencies"
+                << "\nremove\t Remove a C++ module in the project dependencies\n";
         }
     }
 
