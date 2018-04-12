@@ -202,7 +202,6 @@ namespace core{
         
         std::ifstream infile("./" + source_folder + "/CMakeLists.txt", std::ios::in);
         if (!infile) {
-            std::cout << "error !" << std::endl;
             std::cerr << "Could not open the secondaries (inside src and test folders) CMakeLists.txt files\n";
             return;
         }
@@ -253,7 +252,6 @@ namespace core{
         
         std::ifstream infile("./" + source_folder + "/CMakeLists.txt", std::ios::in);
         if (!infile) {
-            std::cout << "error !" << std::endl;
             std::cerr << "Could not open the secondaries CMakeLists.txt files (inside src and test folders)\n";
             return;
         }
@@ -279,7 +277,6 @@ namespace core{
                     if(found_module != std::string::npos){ 
                         std::size_t found_end = previous_line.find(")", found_module);
                         std::string new_line_1 = previous_line.substr(0, found_module - 1);
-                        std::cout << "\nNew_line_1" << new_line_1 << std::endl; 
                         std::string new_line_2 = previous_line.substr(found_module + size_module_name + 16, found_end);
                         std::string new_line = new_line_1 + new_line_2;
                         lines.at(lines.size() - 1) = new_line;
