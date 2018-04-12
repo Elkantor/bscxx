@@ -94,7 +94,6 @@ int main(int argc, char* argv[]){
                     std::cout 
                         << "\nRemove a C++ module from the project's dependencies (located in ./bscxx_modules)"
                         << "\n\nUsage: bscxx remove [OPTION] [module_name]"
-                        << "\n\nOptions:"
                         << "\n";
                 }
 
@@ -107,13 +106,6 @@ int main(int argc, char* argv[]){
                     core::RemoveModuleSourceFilesToSecondaryCmakeListsFile(module_name, "src");
                 }
             }
-        }
-
-        /********************/
-        /* To test features */
-        /********************/ 
-        else if(strcmp(argv[1], "test") == 0){
-            std::cout << "\n\t [Test]";
         }
 
         /************************/
