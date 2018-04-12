@@ -17,6 +17,7 @@ int main(int argc, char* argv[]){
                 core::CreateFolder("lib");
                 core::CreateFolder("test");
                 core::CreateMainFile("./src");
+                core::CreateTestMainFile("./test");
                 if(argv[3] != nullptr){
                     if(strcmp(argv[3], "--dynamic_lib") == 0 || strcmp(argv[3], "-dl") == 0){
                         core::CreateSecondaryCMakeListsFile("./src", argv[2], core::ProjectType::DYNAMIC_LIBRARY);
@@ -35,19 +36,30 @@ int main(int argc, char* argv[]){
         /*********************************************/
         /* Add a package to the project dependencies */
         /*********************************************/ 
-        else if(strcmp(argv[1], "addmodule") == 0 
+        else if(strcmp(argv[1], "add") == 0 
             || strcmp(argv[1], "-am") == 0){
-            std::cout << "\n\t[Add a new module (" << argv[2] << ") dependency to the project]\n\n";
             if(argv[2] != nullptr){
                 std::string module_name;
                 if(argv[3] != nullptr){
                     module_name = argv[3];
                 }
 
+                /*************************/
+                /* Show the help command */
+                /*************************/
+                if(strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0){
+                    std::cout 
+                        << "\nAdd a C++ module in the project's dependencies (located in ./bscxx_modules)"
+                        << "\n\nUsage: bscxx add [OPTION] [module_name]"
+                        << "\n\nOptions:"
+                        << "\n\t--new\t Create a new module skeleton"
+                        << "\n";
+                }
+
                 /****************************/
                 /* If creating a new module */
                 /****************************/
-                if(strcmp(argv[2], "--new") == 0 || strcmp(argv[2], "-n") == 0){
+                else if(strcmp(argv[2], "--new") == 0 || strcmp(argv[2], "-n") == 0){
                     core::CreateFolder("bscxx_modules");
                     core::CreateFolder("bscxx_modules/" + module_name);
                     core::CreateMainCmakeListsFile("./bscxx_modules/" + module_name + "/");
@@ -58,7 +70,38 @@ int main(int argc, char* argv[]){
                     core::CreateMainFile("bscxx_modules/" + module_name + "/src");
                     core::CreateSecondaryCMakeListsFile("bscxx_modules/" + module_name + "/src", module_name);
                     core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
-                    core::AddModuleSourceFilesToSecondaryCmakeListsFile(module_name, "src");
+                    core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
+                    core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
+                }
+            }
+        }
+
+        /**************************************************/
+        /* Remove a package from the project dependencies */
+        /**************************************************/
+        else if(strcmp(argv[1], "remove") == 0 
+            || strcmp(argv[1], "-rmm") == 0){
+            if(argv[2] != nullptr){
+                std::string module_name;
+                module_name = argv[2];
+
+                /*************************/
+                /* Show the help command */
+                /*************************/
+                if(strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0){
+                    std::cout 
+                        << "\nRemove a C++ module from the project's dependencies (located in ./bscxx_modules)"
+                        << "\n\nUsage: bscxx remove [OPTION] [module_name]"
+                        << "\n\nOptions:"
+                        << "\n";
+                }
+
+                /****************************/
+                /* If creating a new module */
+                /****************************/
+                else{
+                    core::RemoveFolder("bscxx_modules/" + module_name);
+                    core::RemoveModuleHeadersFromMainCMakeListsFile("bscxx_modules/" + module_name);
                 }
             }
         }
@@ -74,7 +117,7 @@ int main(int argc, char* argv[]){
         /* Show the app Version */
         /************************/
         else if(strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0){
-            std::cout << "\nBSCXX version 1.0.0";
+            std::cout << "\nBSCXX version 1.0.0\n";
         }
 
         /*****************/
@@ -83,7 +126,7 @@ int main(int argc, char* argv[]){
         else if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
             std::cout << "\n\nCommands:";
             std::cout << "\n\ncreate\t\tCreate a new C++ project";
-            std::cout << "\naddmodule\tAdd a C++ module in the project dependencies";
+            std::cout << "\nadd\tAdd a C++ module in the project dependencies";
             std::cout << "\n";
         }
 
@@ -93,10 +136,9 @@ int main(int argc, char* argv[]){
         else {
             std::cout << "\n\t# [ERROR] Command not valid.";
             std::cout << "\n\nHere is the list of all the available commands:";
-            std::cout << "\n\tcreate : to create a new C++ project";
-            std::cout << "\n\t=> app create [project_name] [--exe (by default) | --static_lib | --dynamic_lib]";
-            std::cout << "\n\n\taddmodule : to add a C++ module in the project dependencies";
-            std::cout << "\n\t=> app addmodule [--new] [module_name]";
+            std::cout << "\n\ncreate\t\tCreate a new C++ project";
+            std::cout << "\nadd\tAdd a C++ module in the project dependencies";
+            std::cout << "\n";
         }
     }
 

@@ -38,6 +38,7 @@ namespace core{
             << "\nendif (MSVC)"
             << "\n\n## Add executables ##"
             << "\n\tadd_subdirectory (src)"
+            << "\n\tadd_subdirectory (test)"
             << "\n## End of adding executables ##";
         outfile.close();
     }
@@ -69,7 +70,9 @@ namespace core{
             << "\n## End of adding source files ##"
             << "\n\n## Remove main.cc files of modules ##"
             << "\n## End of removing main.cc files of modules ##"
-            << "\n\n" << type_project;
+            << "\n\n## Add executables ##"
+            << "\n\t" << type_project
+            << "\n## End of adding executables ##";
         outfile.close();
     }
 
@@ -91,17 +94,27 @@ namespace core{
             << "\n## End of removing main.cc files of modules ##"
             << "\n\n## Add executables ##"
             << "\n\tadd_executable (test_" << project_name << " ${testing_files} ${testing_source_files})"
-            << "\n\n## End of adding executables ##";
+            << "\n## End of adding executables ##";
         outfile.close();
     }
 
     inline void CreateMainFile(const std::string& path){
         std::ofstream outfile(path + "/main.cc");
         outfile 
-            << "#pragma once"
             << "\n\n#include <iostream>"
             << "\n\nint main(int argc, char** argv){"
-            << "\n\tstd::cout << \"test\" << std::endl;"
+            << "\n\tstd::cout << \t\"Running the app...\" << std::endl;"
+            << "\n\n\treturn 0;"
+            << "\n}";
+        outfile.close();
+    }
+
+    inline void CreateTestMainFile(const std::string& path){
+        std::ofstream outfile(path + "/test.cc");
+        outfile 
+            << "\n\n#include <iostream>"
+            << "\n\nint main(int argc, char** argv){"
+            << "\n\tstd::cout << \t\"Performing tests...\" << std::endl;"
             << "\n\n\treturn 0;"
             << "\n}";
         outfile.close();
@@ -122,6 +135,12 @@ namespace core{
         }
     }
 
+    inline void RemoveFolder(const std::string& path){
+        std::string command = "rm -r " + path;
+        const char* command_cstr = command.c_str();
+        system(command_cstr);
+    }
+
     inline void AddModuleHeadersToMainCMakeListsFile(const std::string& path_module){
         std::vector<std::string> lines;
         std::string line;
@@ -135,7 +154,6 @@ namespace core{
         while(!infile.eof()){
             std::getline(infile, line);
             if(line.compare("## End of include libraries ##") == 0){
-                std::cout << lines.at(lines.size() - 1) << std::endl;
                 if(lines.at(lines.size() - 1).compare("\tinclude_directories (\"${PROJECT_BINARY_DIR}/../" + path_module + "/include\")") != 0){
                     lines.emplace_back("\tinclude_directories (\"${PROJECT_BINARY_DIR}/../" + path_module + "/include\")");
                 }
@@ -151,10 +169,36 @@ namespace core{
         outfile.close();
     }
 
-    inline void AddModuleSourceFilesToSecondaryCmakeListsFile(const std::string& module_name, const std::string& source_folder){
+    inline void RemoveModuleHeadersFromMainCMakeListsFile(const std::string& path_module){
         std::vector<std::string> lines;
         std::string line;
-        std::string project_name;
+        std::ifstream infile("./CMakeLists.txt", std::ios::in);
+        
+        if (!infile) {
+            std::cerr << "Could not open the main CMakeLists.txt file\n";
+            return;
+        }
+
+        while(!infile.eof()){
+            std::getline(infile, line);
+            if(line.compare("\tinclude_directories (\"${PROJECT_BINARY_DIR}/../" + path_module + "/include\")") == 0){
+                continue;
+            }else{
+                lines.emplace_back(line);
+            }
+        }
+        infile.close();
+
+        std::ofstream outfile("./CMakeLists.txt");
+        for(int i = 0; i < lines.size(); i++){
+            outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
+        }
+        outfile.close();
+    }
+
+    inline void AddModuleSourceFilesToSecondaryCMakeListsFile(const std::string& module_name, const std::string& source_folder){
+        std::vector<std::string> lines;
+        std::string line;
         
         std::ifstream infile("./" + source_folder + "/CMakeLists.txt", std::ios::in);
         if (!infile) {
@@ -196,11 +240,15 @@ namespace core{
         }
         infile.close();
 
-        std::ofstream outfile("./src/CMakeLists.txt");
+        std::ofstream outfile("./" + source_folder + "/CMakeLists.txt");
         for(int i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
         outfile.close();
+    }
+
+    inline void RemoveModuleSourceFilesToSecondaryCmakeListsFile(const std::string& module_name, const std::string& source_folder){
+
     }
 
 }// namespace core
