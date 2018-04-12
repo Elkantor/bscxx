@@ -68,7 +68,9 @@ int main(int argc, char* argv[]){
                     core::CreateFolder("bscxx_modules/" + module_name + "/lib");
                     core::CreateFolder("bscxx_modules/" + module_name + "/test");
                     core::CreateMainFile("bscxx_modules/" + module_name + "/src");
+                    core::CreateTestMainFile("bscxx_modules/" + module_name + "/test");
                     core::CreateSecondaryCMakeListsFile("bscxx_modules/" + module_name + "/src", module_name);
+                    core::CreateSecondaryCMakeListsFile("bscxx_modules/" + module_name + "/test", module_name);
                     core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
                     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
                     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
