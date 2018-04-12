@@ -121,7 +121,8 @@ int main(int argc, char* argv[]){
         else if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
             std::cout << "\n\nCommands:";
             std::cout << "\n\ncreate\t\tCreate a new C++ project";
-            std::cout << "\nadd\tAdd a C++ module in the project dependencies";
+            std::cout << "\nadd\tAdd a C++ module in the project dependencies (located in ./bscxx_modules)";
+            std::cout << "\nremove\tRemove a C++ module in the project dependencies (located in ./bscxx_modules)";
             std::cout << "\n";
         }
 
@@ -132,7 +133,8 @@ int main(int argc, char* argv[]){
             std::cout << "\n\t# [ERROR] Command not valid.";
             std::cout << "\n\nHere is the list of all the available commands:";
             std::cout << "\n\ncreate\t\tCreate a new C++ project";
-            std::cout << "\nadd\tAdd a C++ module in the project dependencies";
+            std::cout << "\nadd\tAdd a C++ module in the project dependencies (located in ./bscxx_modules)";
+            std::cout << "\nremove\tRemove a C++ module in the project dependencies (located in ./bscxx_modules)";
             std::cout << "\n";
         }
     }
