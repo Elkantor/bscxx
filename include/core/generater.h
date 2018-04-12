@@ -128,15 +128,13 @@ namespace core{
             mode_t mode = 0733;
             error = mkdir(path.c_str(), mode); // can be used on Unix
         #endif
-        if (error != 0) {
-            std::cout << "\t# [ERROR] Can't create the " << path << " folder. (already exists)\n";
-        }else{
-            std::cout << "\t# [SUCCESS] The " << path << " folder is created.\n";
-        }
+        // if (error != 0) {
+        //     std::cout << "\t# [ERROR] Can't create the " << path << " folder. (already exists)\n";
+        // }
     }
 
     inline void RemoveFolder(const std::string& path){
-        std::string command = "rm -r " + path;
+        std::string command = "rm -r " + path + "> null && rm -r null";
         const char* command_cstr = command.c_str();
         system(command_cstr);
     }
