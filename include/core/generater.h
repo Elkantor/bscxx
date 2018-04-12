@@ -248,7 +248,55 @@ namespace core{
     }
 
     inline void RemoveModuleSourceFilesToSecondaryCmakeListsFile(const std::string& module_name, const std::string& source_folder){
+        std::vector<std::string> lines;
+        std::string line;
+        
+        std::ifstream infile("./" + source_folder + "/CMakeLists.txt", std::ios::in);
+        if (!infile) {
+            std::cout << "error !" << std::endl;
+            std::cerr << "Could not open the secondaries CMakeLists.txt files (inside src and test folders)\n";
+            return;
+        }
 
+        int count_lines_removing_main_file = 5;
+        while(!infile.eof()){
+            std::getline(infile, line);
+            if(lines.size() > 0){
+                if(line.compare("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*)") == 0){
+                    continue;
+                }
+                if(count_lines_removing_main_file > 0){
+                    if(line.compare("\tFOREACH(item ${" + module_name + "_source_files})") == 0 
+                        || count_lines_removing_main_file < 5){
+                        count_lines_removing_main_file--;
+                        continue;
+                    }
+                }
+                if(line.compare("## End of adding executables ##") == 0){
+                    std::string previous_line = lines.at(lines.size() -1);
+                    std::size_t size_module_name = module_name.length();
+                    std::size_t found_module = previous_line.find("${" + module_name + "_source_files}");
+                    if(found_module != std::string::npos){ 
+                        std::size_t found_end = previous_line.find(")", found_module);
+                        std::string new_line_1 = previous_line.substr(0, found_module - 1);
+                        std::cout << "\nNew_line_1" << new_line_1 << std::endl; 
+                        std::string new_line_2 = previous_line.substr(found_module + size_module_name + 16, found_end);
+                        std::string new_line = new_line_1 + new_line_2;
+                        lines.at(lines.size() - 1) = new_line;
+                    }
+                    lines.emplace_back("## End of adding executables ##");
+                    continue;
+                }
+            }
+            lines.emplace_back(line);
+        }
+        infile.close();
+
+        std::ofstream outfile("./" + source_folder + "/CMakeLists.txt");
+        for(int i = 0; i < lines.size(); i++){
+            outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
+        }
+        outfile.close();
     }
 
 }// namespace core

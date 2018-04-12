@@ -98,12 +98,13 @@ int main(int argc, char* argv[]){
                         << "\n";
                 }
 
-                /****************************/
-                /* If creating a new module */
-                /****************************/
+                /*******************/
+                /* Remove a module */
+                /*******************/
                 else{
                     core::RemoveFolder("bscxx_modules/" + module_name);
                     core::RemoveModuleHeadersFromMainCMakeListsFile("bscxx_modules/" + module_name);
+                    core::RemoveModuleSourceFilesToSecondaryCmakeListsFile(module_name, "src");
                 }
             }
         }
