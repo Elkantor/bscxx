@@ -1,4 +1,4 @@
-project(app)
+project(bscxx)
 
 set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})
 
@@ -8,4 +8,4 @@ endif (MSVC)
 
 file (GLOB_RECURSE source_files ./*)
 
-add_executable (app ${source_files})
+add_executable (bscxx ${source_files})

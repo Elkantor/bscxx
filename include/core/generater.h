@@ -291,4 +291,16 @@ namespace core{
         outfile.close();
     }
 
+    inline void AddGithubModule(const std::string& github_url, const std::string& module_path){
+        std::string final_path_module = module_path + github_url.substr(github_url.find("/")+1, github_url.length()-1);
+        std::cout << final_path_module << std::endl;
+        std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + "> null && rm -r null";
+        const char* command_cstr = command.c_str();
+        system(command_cstr);
+
+        std::string command_rm = "rm -rf " + final_path_module + "/.git > null && rm -r null";
+        const char* command_rm_cstr = command_rm.c_str();
+        system(command_rm_cstr);
+    }
+
 }// namespace core

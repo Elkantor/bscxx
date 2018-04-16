@@ -75,6 +75,21 @@ int main(int argc, char* argv[]){
                     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
                     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
                 }
+
+                /*****************************/
+                /* If adding a github module */
+                /*****************************/
+                else if(strcmp(argv[2], "--github") == 0){
+                    if(argv[3] != nullptr){
+                        std::string module_name = argv[3];
+                        module_name = module_name.substr(module_name.find("/")+1, module_name.length()-1);
+                        core::CreateFolder("bscxx_modules");
+                        core::AddGithubModule(argv[3], "bscxx_modules/");
+                        core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
+                        core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
+                        core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
+                    }
+                }
             }
         }
 
@@ -82,7 +97,7 @@ int main(int argc, char* argv[]){
         /* Remove a package from the project dependencies */
         /**************************************************/
         else if(strcmp(argv[1], "remove") == 0 
-            || strcmp(argv[1], "-rmm") == 0){
+            || strcmp(argv[1], "-rm") == 0){
             if(argv[2] != nullptr){
                 std::string module_name;
                 module_name = argv[2];
