@@ -293,7 +293,6 @@ namespace core{
 
     inline void AddGithubModule(const std::string& github_url, const std::string& module_path){
         std::string final_path_module = module_path + github_url.substr(github_url.find("/")+1, github_url.length()-1);
-        std::cout << final_path_module << std::endl;
         std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + "> null && rm -r null";
         const char* command_cstr = command.c_str();
         system(command_cstr);
@@ -301,6 +300,30 @@ namespace core{
         std::string command_rm = "rm -rf " + final_path_module + "/.git > null && rm -r null";
         const char* command_rm_cstr = command_rm.c_str();
         system(command_rm_cstr);
+    }
+
+    inline void UpdateDependenciesFile(const std::string& module_name, const std::string& module_version){
+        std::string line;
+        std::ifstream infile("./src/CMakeLists.txt", std::ios::in);
+        if (!infile) {
+            std::cerr << "Could not open the secondaries CMakeLists.txt files (inside src and test folders)\n";
+            return;
+        }
+        std::getline(infile, line);
+        std::string project_name = line.substr(line.find("(")+1, line.length()-1);
+        project_name = project_name.substr(0, project_name.find(")"));
+        infile.close();
+        std::ofstream outfile("./bscxx_dependencies.txt");
+        std::string body;
+        body = "\tBSCXX_PROJECT:\n\n";
+        body += "[" + project_name + "]:^1.0.0\n\n\n";
+        body += "\tBSCXX_DEPENDENCIES:\n\n";
+        for(const auto& p : std::experimental::filesystem::v1::directory_iterator("bscxx_modules")){
+            std::string module_path = p.path().string();
+            body += "[" + module_path.substr(14, module_path.length()-1) + "]: ";
+        }
+        outfile << body;
+        outfile.close();      
     }
 
 }// namespace core
