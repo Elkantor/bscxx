@@ -3,6 +3,5 @@
     "url": "https://github.com/Elkantor/bscxx/releases/download/0.1.0/bscxx.zip",
     "extract_dir": "bscxx",
     "bin": "bscxx/bin/bscxx.exe",
-    "pre_install": "scoop install cmake",
     "licence": "MIT"
 }
