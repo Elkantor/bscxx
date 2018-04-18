@@ -30,6 +30,7 @@ int main(int argc, char* argv[]){
                     core::CreateSecondaryCMakeListsFile("./src", argv[2]);
                 }
                 core::CreateTestCMakeListsFile("./test", argv[2]);
+                core::UpdateDependenciesFile();
             }
         }
 
@@ -74,6 +75,7 @@ int main(int argc, char* argv[]){
                     core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
                     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
                     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
+                    core::UpdateDependenciesFile();
                 }
 
                 /*****************************/
