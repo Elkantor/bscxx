@@ -4,8 +4,5 @@
     "extract_dir": "bscxx",
     "bin": "bscxx.exe",
     "pre_install": "scoop install cmake",
-    "autoupdate": {
-        "url": "https://github.com/Elkantor/bscxx/releases/download/$version/bscxx.zip"
-    },
     "licence": "MIT"
 }
