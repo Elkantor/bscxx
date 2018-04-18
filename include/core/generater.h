@@ -198,7 +198,7 @@ namespace core{
         std::vector<std::string> lines;
         std::string line;
         
-        std::ifstream infile("./" + source_folder + "/CMakeLists.txt", std::ios::in);
+        std::ifstream infile(source_folder + "/CMakeLists.txt", std::ios::in);
         if (!infile) {
             std::cerr << "Could not open the secondaries (inside src and test folders) CMakeLists.txt files\n";
             return;
@@ -207,8 +207,8 @@ namespace core{
         while(!infile.eof()){
             std::getline(infile, line);
             if(line.compare("## End of adding source files ##") == 0){
-                if(lines.at(lines.size() - 1).compare("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*)") != 0){
-                    lines.emplace_back("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*)");
+                if(lines.at(lines.size() - 1).compare("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "../bscxx_modules/" + module_name + "/src/*)") != 0){
+                    lines.emplace_back("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "../bscxx_modules/" + module_name + "/src/*)");
                 }
                 lines.emplace_back("## End of adding source files ##");
             }else if(line.compare("## End of removing main.cc files of modules ##") == 0){
@@ -261,7 +261,7 @@ namespace core{
         while(!infile.eof()){
             std::getline(infile, line);
             if(lines.size() > 0){
-                if(line.compare("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "./bscxx_modules/" + module_name + "/src/*)") == 0){
+                if(line.compare("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "bscxx_modules/" + module_name + "/src/*)") == 0){
                     continue;
                 }
                 if(count_lines_removing_main_file > 0){
@@ -384,6 +384,29 @@ namespace core{
         const char* command_rm_cstr = command_rm.c_str();
         system(command_rm_cstr);
         AddDependencyUrlToModule(final_path_module, "http://github.com/" + github_url);
+    }
+
+    inline void AddLocalModule(
+        const std::string& module_path, 
+        const std::string& modules_folder,
+        std::string* out_module_name
+    ){
+        std::string line;
+        std::ifstream infile(module_path + "/src/CMakeLists.txt", std::ios::in);
+        if (!infile) {
+            std::cerr << "Could not open the CMakeLists.txt file (inside the " + module_path + "/src folder)\n";
+            return;
+        }
+        std::getline(infile, line);
+        std::string project_name = line.substr(line.find("(")+1, line.length()-1);
+        project_name = project_name.substr(0, project_name.find(")"));
+        *out_module_name = project_name;
+        infile.close();
+        std::cout << "Adding " + project_name + " module..." << std::endl;
+        CreateFolder(modules_folder + project_name);
+        std::experimental::filesystem::v1::remove_all(modules_folder + project_name);
+        std::experimental::filesystem::v1::copy(module_path, modules_folder + project_name, std::experimental::filesystem::v1::copy_options::recursive);
+        AddDependencyUrlToModule(modules_folder + project_name, "local_module");
     }
 
 }// namespace core

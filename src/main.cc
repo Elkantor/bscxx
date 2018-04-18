@@ -91,6 +91,22 @@ int main(int argc, char* argv[]){
                         core::UpdateDependenciesFile();
                     }
                 }
+
+                /*****************************/
+                /* If adding a local module */
+                /*****************************/
+                else if(strcmp(argv[2], "--local") == 0){
+                    if(argv[3] != nullptr){
+                        std::string module_name;
+                        core::CreateFolder("bscxx_modules");
+                        core::AddLocalModule(argv[3], "./bscxx_modules/", &module_name);
+                        core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
+                        core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
+                        core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
+                        core::UpdateDependenciesFile();
+                        std::cout << "Module correclty added, project updated.\n";
+                    }
+                }
             }
         }
 
@@ -119,6 +135,7 @@ int main(int argc, char* argv[]){
                     core::RemoveFolder("bscxx_modules/" + module_name);
                     core::RemoveModuleHeadersFromMainCMakeListsFile("bscxx_modules/" + module_name);
                     core::RemoveModuleSourceFilesToSecondaryCmakeListsFile(module_name, "src");
+                    core::UpdateDependenciesFile();  
                 }
             }
         }
