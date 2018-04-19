@@ -9,28 +9,55 @@ int main(int argc, char* argv[]){
         /* Create a new project */
         /************************/ 
         if(strcmp(argv[1], "create") == 0){
-            std::cout << "\n\t[Create a new project]\n\n";
             if(argv[2] != nullptr){
-                core::CreateMainCmakeListsFile("./");
-                core::CreateFolder("src");
-                core::CreateFolder("include");
-                core::CreateFolder("lib");
-                core::CreateFolder("test");
-                core::CreateMainFile("./src");
-                core::CreateTestMainFile("./test");
-                if(argv[3] != nullptr){
-                    if(strcmp(argv[3], "--dynamic_lib") == 0 || strcmp(argv[3], "-dl") == 0){
-                        core::CreateSecondaryCMakeListsFile("./src", argv[2], core::ProjectType::DYNAMIC_LIBRARY);
-                    }else if(strcmp(argv[3], "--static_lib") == 0 || strcmp(argv[3], "-sl") == 0){
-                        core::CreateSecondaryCMakeListsFile("./src", argv[2], core::ProjectType::STATIC_LIBRARY);
+
+                /*************************/
+                /* Show the help command */
+                /*************************/
+                if(strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0){
+                    std::cout 
+                        << "\nCreate a new C++ project (can be used as a module in an other project too)"
+                        << "\n\nUsage: bscxx create [project_name]"
+                        // << "\n\nOptions:"
+                        // << "\n\t--new\t Create a new module's skeleton"
+                        // << "\n\t--local\t Add a new module from a local folder"
+                        // << "\n\t--github\t Add a new module from a github repository"
+                        << "\n";
+                }
+                
+                else{
+                    core::CreateMainCmakeListsFile("./");
+                    core::CreateFolder("src");
+                    core::CreateFolder("include");
+                    core::CreateFolder("lib");
+                    core::CreateFolder("test");
+                    core::CreateMainFile("./src");
+                    core::CreateTestMainFile("./test");
+                    if(argv[3] != nullptr){
+                        if(strcmp(argv[3], "--dynamic_lib") == 0 || strcmp(argv[3], "-dl") == 0){
+                            core::CreateSecondaryCMakeListsFile("./src", argv[2], core::ProjectType::DYNAMIC_LIBRARY);
+                        }else if(strcmp(argv[3], "--static_lib") == 0 || strcmp(argv[3], "-sl") == 0){
+                            core::CreateSecondaryCMakeListsFile("./src", argv[2], core::ProjectType::STATIC_LIBRARY);
+                        }else{
+                            core::CreateSecondaryCMakeListsFile("./src", argv[2]);
+                        }
                     }else{
                         core::CreateSecondaryCMakeListsFile("./src", argv[2]);
                     }
-                }else{
-                    core::CreateSecondaryCMakeListsFile("./src", argv[2]);
+                    core::CreateTestCMakeListsFile("./test", argv[2]);
+                    core::CreateFolder("bscxx_modules");
+                    core::UpdateDependenciesFile();
                 }
-                core::CreateTestCMakeListsFile("./test", argv[2]);
-                core::UpdateDependenciesFile();
+            }
+
+            else{
+                /***********/
+                /* Default */
+                /***********/ 
+                std::cout 
+                    << "\nError: project name can't be empty"
+                    << "\n\nUsage: bscxx create [project_name]"
+                    << "\n";
             }
         }
 
@@ -54,6 +81,8 @@ int main(int argc, char* argv[]){
                         << "\n\nUsage: bscxx add [OPTION] [module_name]"
                         << "\n\nOptions:"
                         << "\n\t--new\t Create a new module's skeleton"
+                        << "\n\t--local\t Add a new module from a local folder"
+                        << "\n\t--github\t Add a new module from a github repository"
                         << "\n";
                 }
 
@@ -61,6 +90,15 @@ int main(int argc, char* argv[]){
                 /* If creating a new module */
                 /****************************/
                 else if(strcmp(argv[2], "--new") == 0 || strcmp(argv[2], "-n") == 0){
+                    /*************************/
+                    /* Show the help command */
+                    /*************************/
+                    if(strcmp(argv[3], "-h") == 0 || strcmp(argv[3], "--help") == 0){
+                        std::cout 
+                            << "\nCreate a new skeleton of a C++ module in the project's dependencies (located in ./bscxx_modules)"
+                            << "\n\nUsage: bscxx add --new [module_name]"
+                            << "\n";
+                    }
                     core::CreateFolder("bscxx_modules");
                     core::CreateFolder("bscxx_modules/" + module_name);
                     core::CreateMainCmakeListsFile("./bscxx_modules/" + module_name + "/");
@@ -156,8 +194,9 @@ int main(int argc, char* argv[]){
             std::cout 
                 << "\n\nCommands:"
                 << "\n\ncreate\t Create a new C++ project"
-                << "\nadd\t Add a C++ module in the project dependencies"
-                << "\nremove\t Remove a C++ module in the project dependencies\n";
+                << "\nadd\t Add a C++ module to the project dependencies"
+                << "\nremove\t Remove a C++ module from the project dependencies\n"
+                << "\nSee the help for more details : bscxx [command] --help\n";
         }
 
         /***********/
@@ -165,11 +204,12 @@ int main(int argc, char* argv[]){
         /***********/ 
         else {
             std::cout 
-                << "\n\t# [ERROR] Command not valid."
-                << "\n\nHere is the list of all the available commands:"
+                << "\nError: bscxx '" << argv[1] << "' is not a valid command."
+                << "\n\nAvailable commands:"
                 << "\n\ncreate\t Create a new C++ project"
                 << "\nadd\t Add a C++ module in the project dependencies"
-                << "\nremove\t Remove a C++ module in the project dependencies\n";
+                << "\nremove\t Remove a C++ module from the project dependencies\n"
+                << "\nSee the help for more details : bscxx [command] --help\n";
         }
     }
 

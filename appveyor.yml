@@ -1,0 +1,23 @@
+version: '1.0.{build}'
+
+image: Visual Studio 2017
+
+platform:
+  - x64
+ 
+configuration:
+  - Release
+  - Debug
+
+install:
+    - git submodule update --init --recursive
+
+before_build:
+    - mkdir build && cd build
+    - cmake -B../build -H.. -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE:STRING=Release
+
+build:
+  project: $(APPVEYOR_BUILD_FOLDER)\build\Project.sln
+
+test_script:
+  - '%APPVEYOR_BUILD_FOLDER%\build\test\bin\%CONFIGURATION%\bscxx_test.exe'

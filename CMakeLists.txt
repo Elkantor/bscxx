@@ -16,4 +16,5 @@ include_directories ("${PROJECT_BINARY_DIR}/../include")
 
 ## Add executable for the app project ##
 add_subdirectory(src)
+add_subdirectory(test)
 ## End of adding executables ##
