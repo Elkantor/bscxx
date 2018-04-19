@@ -16,7 +16,7 @@ You can install automaticly bscxx with the help of scoop, a windows package mana
 ## Documentation 
 
 <blockquote>
-<p><g-emoji class="g-emoji" alias="bulb" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png" ios-version="6.0"><img class="emoji" alt="bulb" height="20" width="20" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png"></g-emoji> [Warning] bscxx is a WIP project, so the documentation is not available today, but will be release really soon.
+<p><g-emoji class="g-emoji" alias="bulb" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png" ios-version="6.0"><img class="emoji" alt="bulb" height="20" width="20" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png"></g-emoji> [Warning] bscxx is a WIP project, so the documentation is not available today, but will be released as soon as possible.
 </p>
 </blockquote>
 
