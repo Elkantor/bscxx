@@ -25,7 +25,7 @@ Now, open a new *__cmd__* and type this command to add this git repository as a 
 scoop bucket add bscxx https://github.com/Elkantor/bscxx.git
 ```
 
-Then, finally, install bscxx with this command: 
+Finally, install bscxx with this command: 
 ```shell
 scoop install bscxx
 ```
@@ -55,7 +55,7 @@ If you don't have Ninja and want to use it, install it first (you can easily ins
 cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE:STRING=Release
 ```
 
-And now, launch the app to test it if everything compiled fine:
+And finally, launch the app to test it if everything compiled fine:
 ```shell
 ../build/test/bin/Release/bscxx -h
 ```
