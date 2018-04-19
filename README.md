@@ -9,9 +9,28 @@ It's really end goal is to be a package manager, to easily include C++ modules a
 </p>
 </blockquote>
 
-You have trhee choices to install bscxx. You can download the first release (for now, it's just available on Windows 64 bits system), and add it to your path environment.
+You have trhee choices to install bscxx. You can download the [released version](https://github.com/Elkantor/bscxx/releases) (for now, it's just available on Windows 64 bits system), and add it to your environment path.
 
-You can install automaticly bscxx with the help of scoop, a windows package manager for portable applications.
+You can install automaticly bscxx with the help of [*__scoop__*,](https://github.com/lukesampson/scoop) a windows package manager for portable apps.
+Start by installing *__scoop__* (on Windows only) with this PowerShell command (you need PowerShell 3 at least):
+```shell
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+```
+
+Now, open a new *__cmd__* and type this command to add this git repository as a scoop bucket:
+```shell
+scoop bucket add bscxx https://github.com/Elkantor/bscxx.git
+```
+
+Then, finally, install bscxx with this command: 
+```shell
+scoop install bscxx
+```
+
+Now, you should be ready to use bscxx. You can test if it has correctly been installed by typing the following command for example:
+```shell
+bscxx -h
+```
 
 ## Documentation 
 
