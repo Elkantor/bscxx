@@ -36,8 +36,7 @@ bscxx -h
 ```
 ---
 
-3. Or you can build bscxx yourself by cloning this repository.
-Start by cloning this repository:
+3. Or you can build bscxx yourself by cloning this repository:
 ```shell
 git clone https://github.com/Elkantor/bscxx
 cd bscxx
