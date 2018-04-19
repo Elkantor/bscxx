@@ -9,9 +9,12 @@ It's really end goal is to be a package manager, to easily include C++ modules a
 </p>
 </blockquote>
 
-You have trhee choices to install bscxx. You can download the [released version](https://github.com/Elkantor/bscxx/releases) (for now, it's just available on Windows 64 bits system), and add it to your environment path.
+You have trhee choices to install bscxx. 
 
-You can install automaticly bscxx with the help of [*__scoop__*,](https://github.com/lukesampson/scoop) a windows package manager for portable apps.
+1. You can download the [released version](https://github.com/Elkantor/bscxx/releases) (for now, it's just available on Windows 64 bits system), and add it to your environment path.
+---
+
+2. You can easily install bscxx with the help of [*__scoop__*,](https://github.com/lukesampson/scoop) a windows package manager for portable apps.
 Start by installing *__scoop__* (on Windows only) with this PowerShell command (you need PowerShell 3 at least):
 ```shell
 iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
@@ -30,6 +33,32 @@ scoop install bscxx
 Now, you should be ready to use bscxx. You can test if it has correctly been installed by typing the following command for example:
 ```shell
 bscxx -h
+```
+---
+
+3. Or you can build bscxx yourself by cloning this repository.
+Start by cloning this repository:
+```shell
+git clone https://github.com/Elkantor/bscxx
+cd bscxx
+```
+
+Create a build folder:
+```shell
+mkdir build
+cd build
+```
+
+Run this cmake command to create the build system files.
+You can use whatever build system you want like Make, MSVS/Cl... I personnaly prefer using [Ninja](https://ninja-build.org/) when I can. 
+If you don't have Ninja and want to use it, install it first (you can easily install it with *__scoop__* or *_chocolatey__*).
+```shell
+cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE:STRING=Release
+```
+
+And now, launch the app to test it if everything compiled fine:
+```shell
+../build/test/bin/Release/bscxx -h
 ```
 
 ## Documentation 
