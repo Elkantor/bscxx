@@ -374,6 +374,23 @@ namespace core{
         outfile.close();      
     }
 
+    inline bool CreateSubdirectoryIncludeFolder(const std::string& module_path){
+        std::string module_name = module_path.substr(module_path.find("/", 14)+1, module_path.length()-1);
+        std::string new_include_path = module_path + "/include/" + module_name;
+        CreateFolder(module_path + '/' + module_name);
+        std::experimental::filesystem::v1::copy(module_path + "/include/", module_path + '/' + module_name, std::experimental::filesystem::v1::copy_options::recursive);
+        if(!std::experimental::filesystem::v1::remove_all(module_path + "/include")){
+            return false;
+        }
+        CreateFolder(module_path + "/include");
+        std::experimental::filesystem::v1::copy(module_path + '/' + module_name, module_path + "/include/" + module_name, std::experimental::filesystem::v1::copy_options::recursive);
+        if(!std::experimental::filesystem::v1::remove(module_path + '/' + module_name)){
+            return false;
+        }
+        
+        return true;
+    }
+
     inline void AddGithubModule(const std::string& github_url, const std::string& module_path){
         std::string final_path_module = module_path + github_url.substr(github_url.find("/")+1, github_url.length()-1);
         std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + "> null && rm -r null";
@@ -383,6 +400,7 @@ namespace core{
         const char* command_rm_cstr = command_rm.c_str();
         system(command_rm_cstr);
         AddDependencyUrlToModule(final_path_module, "http://github.com/" + github_url);
+        CreateSubdirectoryIncludeFolder(final_path_module);
     }
 
     inline void AddLocalModule(
@@ -406,6 +424,7 @@ namespace core{
         std::experimental::filesystem::v1::remove_all(modules_folder + project_name);
         std::experimental::filesystem::v1::copy(module_path, modules_folder + project_name, std::experimental::filesystem::v1::copy_options::recursive);
         AddDependencyUrlToModule(modules_folder + project_name, "local_module");
+        CreateSubdirectoryIncludeFolder(modules_folder + project_name);
     }
 
 }// namespace core

@@ -18,10 +18,6 @@ int main(int argc, char* argv[]){
                     std::cout 
                         << "\nCreate a new C++ project (can be used as a module in an other project too)"
                         << "\n\nUsage: bscxx create [project_name]"
-                        // << "\n\nOptions:"
-                        // << "\n\t--new\t Create a new module's skeleton"
-                        // << "\n\t--local\t Add a new module from a local folder"
-                        // << "\n\t--github\t Add a new module from a github repository"
                         << "\n";
                 }
                 
