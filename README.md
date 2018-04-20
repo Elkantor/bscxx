@@ -69,7 +69,7 @@ And finally, launch the app to test it if everything compiled fine:
 
 ## Developing
 
-### Built and developped with
+### Built and developed with
 
 * [CMake](https://cmake.org/)
 * C++ 17
