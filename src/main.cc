@@ -1,5 +1,5 @@
 #include <core/common.h>
-#include <core/generater.h>
+#include <core/generator.h>
 
 int main(int argc, char* argv[]){
      

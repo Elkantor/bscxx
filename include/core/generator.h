@@ -158,7 +158,7 @@ namespace core{
         infile.close();
 
         std::ofstream outfile("./CMakeLists.txt");
-        for(int i = 0; i < (int)lines.size(); i++){
+        for(size_t i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
         outfile.close();
@@ -185,7 +185,7 @@ namespace core{
         infile.close();
 
         std::ofstream outfile("./CMakeLists.txt");
-        for(int i = 0; i < (int)lines.size(); i++){
+        for(size_t i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
         outfile.close();
@@ -238,7 +238,7 @@ namespace core{
         infile.close();
 
         std::ofstream outfile("./" + source_folder + "/CMakeLists.txt");
-        for(int i = 0; i < (int)lines.size(); i++){
+        for(size_t i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == (int)lines.size()-1) ? "" : "\n");
         }
         outfile.close();
@@ -291,7 +291,7 @@ namespace core{
         infile.close();
 
         std::ofstream outfile("./" + source_folder + "/CMakeLists.txt");
-        for(int i = 0; i < (int)lines.size(); i++){
+        for(size_t i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
         outfile.close();
@@ -377,8 +377,7 @@ namespace core{
     inline void AddGithubModule(const std::string& github_url, const std::string& module_path){
         std::string final_path_module = module_path + github_url.substr(github_url.find("/")+1, github_url.length()-1);
         std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + "> null && rm -r null";
-        const char* command_cstr = command.c_str();
-        system(command_cstr);
+        system(command.c_str());
 
         std::string command_rm = "rm -rf " + final_path_module + "/.git > null && rm -r null";
         const char* command_rm_cstr = command_rm.c_str();
