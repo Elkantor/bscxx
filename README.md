@@ -9,7 +9,7 @@ Its end goal is to be a package manager, to easily include C++ modules to your p
 </p>
 </blockquote>
 
-You have trhee choices to install bscxx. 
+You have three choices to install bscxx. 
 
 1. You can download the [released version](https://github.com/Elkantor/bscxx/releases) (for now, it's just available on Windows 64 bits system), and add it to your environment path.
 ---
