@@ -134,7 +134,6 @@ namespace core{
         std::experimental::filesystem::v1::path path_to_remove = path;
         std::string command;
         if(std::experimental::filesystem::v1::exists(path_to_remove)){
-            std::cout << "OK folder exists : " << path + "/" << std::endl;
             #if defined(_WIN32)
                 std::string windows_path = path;
                 std::string from = "/";
@@ -144,7 +143,6 @@ namespace core{
                     windows_path.replace(start_pos, from.length(), to);
                     start_pos += to.length();
                 }
-                std::cout << windows_path << std::endl;
                 command = "rmdir /s /q " + windows_path + " >> NULL && del NULL";// can be used on Windows
             #else 
                 command = "rm -rf " + path; // can be used on Unix
@@ -438,17 +436,20 @@ namespace core{
         std::string module_name = module_path.substr(module_path.find("/", 14)+1, module_path.length()-1);
         std::string new_include_path = module_path + "/include/" + module_name;
         CreateFolder(module_path + '/' + module_name);
-        std::experimental::filesystem::v1::copy(module_path + "/include/", module_path + '/' + module_name, std::experimental::filesystem::v1::copy_options::recursive);
-        if(!std::experimental::filesystem::v1::remove_all(module_path + "/include")){
-            return false;
+        if(std::experimental::filesystem::v1::exists(module_path + "/include")){
+            std::experimental::filesystem::v1::copy(module_path + "/include/", module_path + '/' + module_name, std::experimental::filesystem::v1::copy_options::recursive);
+            if(!RemoveFolder(module_path + "/include")){
+                return false;
+            }
+            CreateFolder(module_path + "/include");
+            std::experimental::filesystem::v1::copy(module_path + '/' + module_name, module_path + "/include/" + module_name, std::experimental::filesystem::v1::copy_options::recursive);
+            if(!RemoveFolder(module_path + '/' + module_name)){
+                return false;
+            }
+            
+            return true;
         }
-        CreateFolder(module_path + "/include");
-        std::experimental::filesystem::v1::copy(module_path + '/' + module_name, module_path + "/include/" + module_name, std::experimental::filesystem::v1::copy_options::recursive);
-        if(!std::experimental::filesystem::v1::remove(module_path + '/' + module_name)){
-            return false;
-        }
-        
-        return true;
+        return false;
     }
 
     inline bool AddGithubModule(const std::string& github_url, const std::string& module_path){
@@ -459,12 +460,9 @@ namespace core{
         if(!std::experimental::filesystem::v1::exists(final_path_module + "/dependencies.bscxx")){
             return false;
         }
-        std::cout << "OK it's a bscxx module" << std::endl;
-        if(!RemoveFolder(final_path_module + "/.git")){
-            std::cout << "folder deleted" << std::endl;
-        }
-        // AddDependencyUrlToModule(final_path_module, "http://github.com/" + github_url);
-        // CreateSubdirectoryIncludeFolder(final_path_module);
+        RemoveFolder(final_path_module + "/.git");
+        AddDependencyUrlToModule(final_path_module, "http://github.com/" + github_url);
+        CreateSubdirectoryIncludeFolder(final_path_module);
         return true;
     }
 
@@ -486,7 +484,7 @@ namespace core{
         infile.close();
         std::cout << "Adding " + project_name + " module..." << std::endl;
         CreateFolder(modules_folder + project_name);
-        std::experimental::filesystem::v1::remove_all(modules_folder + project_name);
+        RemoveFolder(modules_folder + project_name);
         std::experimental::filesystem::v1::copy(module_path, modules_folder + project_name, std::experimental::filesystem::v1::copy_options::recursive);
         AddDependencyUrlToModule(modules_folder + project_name, "local_module");
         CreateSubdirectoryIncludeFolder(modules_folder + project_name);
@@ -496,6 +494,14 @@ namespace core{
         std::string command = "git init >> NULL";
         system(command.c_str());
         std::experimental::filesystem::v1::remove("./NULL");
+
+        // Create the gitignore file
+        std::ofstream outfile(".gitignore");
+        std::string body;
+        body += "# BSCXX modules folder\nbscxx_modules\n\n";
+        body += "# Build folder\nbuild\n\n";
+        outfile << body;
+        outfile.close();
         return true;
     }
 
@@ -514,7 +520,6 @@ namespace core{
             std::getline(infile, line);
             if(module_lines){
                 std::string module_url = line.substr(line.find("|")+2, line.length()-1);
-                std::cout << module_url << std::endl;
             }
             if(line.compare("BSCXX_DEPENDENCIES:") == 0){
                 module_lines = true;
