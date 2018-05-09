@@ -22,10 +22,10 @@ int main(int argc, char* argv[]){
                 }
                 
                 else{
+                    core::InitializeGit();
                     core::CreateMainCmakeListsFile("./");
                     core::CreateFolder("src");
                     core::CreateFolder("include");
-                    core::CreateFolder("lib");
                     core::CreateFolder("test");
                     core::CreateMainFile("./src");
                     core::CreateTestMainFile("./test");
@@ -100,7 +100,6 @@ int main(int argc, char* argv[]){
                     core::CreateFolder("bscxx_modules/" + module_name + "/src");
                     core::CreateFolder("bscxx_modules/" + module_name + "/include");
                     core::CreateSubdirectoryIncludeFolder("bscxx_modules/" + module_name);
-                    core::CreateFolder("bscxx_modules/" + module_name + "/lib");
                     core::CreateFolder("bscxx_modules/" + module_name + "/test");
                     core::CreateMainFile("bscxx_modules/" + module_name + "/src");
                     core::CreateTestMainFile("bscxx_modules/" + module_name + "/test");

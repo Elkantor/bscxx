@@ -131,14 +131,7 @@ namespace core{
     }
 
     inline void RemoveFolder(const std::string& path){
-        std::string command;
-        #if defined(_WIN32)
-            command = "rmdir /q /s " + path + "> null && rmdir /q /s null"; // can be used on Windows
-        #else 
-            command = "rm -r " + path + "> null && rm -r null"; // can be used on Unix
-        #endif
-        const char* command_cstr = command.c_str();
-        system(command_cstr);
+        std::experimental::filesystem::v1::remove_all(path);
     }
 
     inline bool GetProjectName(std::string* out_project_name){
@@ -324,7 +317,6 @@ namespace core{
     inline bool AddDependencyUrlToModule(const std::string& module_path, const std::string& module_url){
         std::vector<std::string> lines;
         std::string line;
-        
         std::ifstream infile("./" + module_path + "/dependencies.bscxx", std::ios::in);
         if (!infile) {
             std::cerr << "Could not open the dependencies.bscxx file (inside the " + module_path + " folder)\n";
@@ -354,8 +346,8 @@ namespace core{
 
         std::ofstream outfile("./" + module_path + "/dependencies.bscxx");
         std::string body;
-        for(const auto& line : lines){
-            body += line + "\n";
+        for(const auto& line_body : lines){
+            body += line_body + "\n";
         }
         outfile << body;
         outfile.close();
@@ -443,9 +435,7 @@ namespace core{
         std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + "> null && rm -r null";
         system(command.c_str());
 
-        std::string command_rm = "rm -rf " + final_path_module + "/.git > null && rm -r null";
-        const char* command_rm_cstr = command_rm.c_str();
-        system(command_rm_cstr);
+        RemoveFolder("./" + final_path_module + "/.git");
         AddDependencyUrlToModule(final_path_module, "http://github.com/" + github_url);
         CreateSubdirectoryIncludeFolder(final_path_module);
     }
@@ -472,6 +462,13 @@ namespace core{
         std::experimental::filesystem::v1::copy(module_path, modules_folder + project_name, std::experimental::filesystem::v1::copy_options::recursive);
         AddDependencyUrlToModule(modules_folder + project_name, "local_module");
         CreateSubdirectoryIncludeFolder(modules_folder + project_name);
+    }
+
+    inline bool InitializeGit(){
+        std::string command = "git init >> NULL";
+        system(command.c_str());
+        std::experimental::filesystem::v1::remove("./NULL");
+        return true;
     }
 
     inline bool DownloadModules(){
