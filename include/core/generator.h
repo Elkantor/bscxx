@@ -130,8 +130,29 @@ namespace core{
         #endif
     }
 
-    inline void RemoveFolder(const std::string& path){
-        std::experimental::filesystem::v1::remove_all(path);
+    inline bool RemoveFolder(const std::string& path){
+        std::experimental::filesystem::v1::path path_to_remove = path;
+        std::string command;
+        if(std::experimental::filesystem::v1::exists(path_to_remove)){
+            std::cout << "OK folder exists : " << path + "/" << std::endl;
+            #if defined(_WIN32)
+                std::string windows_path = path;
+                std::string from = "/";
+                std::string to = "\\";
+                size_t start_pos = 0;
+                while((start_pos = windows_path.find(from, start_pos)) != std::string::npos) {
+                    windows_path.replace(start_pos, from.length(), to);
+                    start_pos += to.length();
+                }
+                std::cout << windows_path << std::endl;
+                command = "rmdir /s /q " + windows_path + " >> NULL && del NULL";// can be used on Windows
+            #else 
+                command = "rm -rf " + path; // can be used on Unix
+            #endif
+            system(command.c_str());
+            return true;
+        }
+        return false;
     }
 
     inline bool GetProjectName(std::string* out_project_name){
@@ -430,14 +451,21 @@ namespace core{
         return true;
     }
 
-    inline void AddGithubModule(const std::string& github_url, const std::string& module_path){
+    inline bool AddGithubModule(const std::string& github_url, const std::string& module_path){
         std::string final_path_module = module_path + github_url.substr(github_url.find("/")+1, github_url.length()-1);
         std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + "> null && rm -r null";
         system(command.c_str());
-
-        RemoveFolder("./" + final_path_module + "/.git");
-        AddDependencyUrlToModule(final_path_module, "http://github.com/" + github_url);
-        CreateSubdirectoryIncludeFolder(final_path_module);
+        
+        if(!std::experimental::filesystem::v1::exists(final_path_module + "/dependencies.bscxx")){
+            return false;
+        }
+        std::cout << "OK it's a bscxx module" << std::endl;
+        if(!RemoveFolder(final_path_module + "/.git")){
+            std::cout << "folder deleted" << std::endl;
+        }
+        // AddDependencyUrlToModule(final_path_module, "http://github.com/" + github_url);
+        // CreateSubdirectoryIncludeFolder(final_path_module);
+        return true;
     }
 
     inline void AddLocalModule(

@@ -119,11 +119,15 @@ int main(int argc, char* argv[]){
                         std::string module_name = argv[3];
                         module_name = module_name.substr(module_name.find("/")+1, module_name.length()-1);
                         core::CreateFolder("bscxx_modules");
-                        core::AddGithubModule(argv[3], "bscxx_modules/");
+                        if(!core::AddGithubModule(argv[3], "bscxx_modules/")){
+                            std::cout << "Not a bscxx module repository.\n";
+                            return false;
+                        }
                         core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
                         core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
                         core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
                         core::UpdateDependenciesFile();
+                        std::cout << "Module correclty added, project updated.\n";
                     }
                 }
 
