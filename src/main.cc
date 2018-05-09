@@ -76,9 +76,8 @@ int main(int argc, char* argv[]){
                         << "\nAdd a C++ module in the project's dependencies (located in ./bscxx_modules)"
                         << "\n\nUsage: bscxx add [OPTION] [module_name]"
                         << "\n\nOptions:"
-                        << "\n\t--new\t Create a new module's skeleton"
-                        << "\n\t--local\t Add a new module from a local folder"
-                        << "\n\t--github\t Add a new module from a github repository"
+                        << "\n\t--local\tAdd a new module from a local folder"
+                        << "\n\t--github\tAdd a new module from a github repository"
                         << "\n";
                 }
 
@@ -100,6 +99,7 @@ int main(int argc, char* argv[]){
                     core::CreateMainCmakeListsFile("./bscxx_modules/" + module_name + "/");
                     core::CreateFolder("bscxx_modules/" + module_name + "/src");
                     core::CreateFolder("bscxx_modules/" + module_name + "/include");
+                    core::CreateSubdirectoryIncludeFolder("bscxx_modules/" + module_name);
                     core::CreateFolder("bscxx_modules/" + module_name + "/lib");
                     core::CreateFolder("bscxx_modules/" + module_name + "/test");
                     core::CreateMainFile("bscxx_modules/" + module_name + "/src");
@@ -146,6 +146,20 @@ int main(int argc, char* argv[]){
             }
         }
 
+        /****************************/
+        /* Install the dependencies */
+        /****************************/
+        else if(strcmp(argv[1], "install") == 0){
+            
+        }
+
+        /********************************/
+        /* Update the dependencies file */
+        /********************************/
+        else if(strcmp(argv[1], "update") == 0){
+            core::UpdateGitUrlProject();
+        }
+
         /**************************************************/
         /* Remove a package from the project dependencies */
         /**************************************************/
@@ -177,10 +191,10 @@ int main(int argc, char* argv[]){
         }
 
         /************************/
-        /* Show the app Version */
+        /* Show the app version */
         /************************/
         else if(strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0){
-            std::cout << "\nBSCXX version 1.0.0\n";
+            std::cout << "\nBSCXX version 0.1.3\n";
         }
 
         /*****************/
@@ -189,9 +203,10 @@ int main(int argc, char* argv[]){
         else if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
             std::cout 
                 << "\n\nCommands:"
-                << "\n\ncreate\t Create a new C++ project"
-                << "\nadd\t Add a C++ module to the project dependencies"
-                << "\nremove\t Remove a C++ module from the project dependencies\n"
+                << "\n\ncreate\tCreate a new C++ project"
+                << "\nadd\tAdd a C++ module to the project dependencies"
+                << "\nremove\tRemove a C++ module from the project dependencies\n"
+                << "\nupdate\tUpdate the url of this project in the dependencies file (dependencies.bscxx)\n"
                 << "\nSee the help for more details : bscxx [command] --help\n";
         }
 
@@ -202,9 +217,10 @@ int main(int argc, char* argv[]){
             std::cout 
                 << "\nError: bscxx '" << argv[1] << "' is not a valid command."
                 << "\n\nAvailable commands:"
-                << "\n\ncreate\t Create a new C++ project"
-                << "\nadd\t Add a C++ module in the project dependencies"
-                << "\nremove\t Remove a C++ module from the project dependencies\n"
+                << "\n\ncreate\tCreate a new C++ project"
+                << "\nadd\tAdd a C++ module in the project dependencies"
+                << "\nremove\tRemove a C++ module from the project dependencies\n"
+                << "\nupdate\tUpdate the url of this project in the dependencies file (dependencies.bscxx)\n"
                 << "\nSee the help for more details : bscxx [command] --help\n";
         }
     }

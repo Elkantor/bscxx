@@ -101,9 +101,9 @@ namespace core{
     inline void CreateMainFile(const std::string& path){
         std::ofstream outfile(path + "/main.cc");
         outfile 
-            << "\n\n#include <iostream>"
+            << "#include <iostream>"
             << "\n\nint main(int argc, char** argv){"
-            << "\n\tstd::cout << \t\"Running the app...\" << std::endl;"
+            << "\n\tstd::cout << Running the app... << std::endl;"
             << "\n\n\treturn 0;"
             << "\n}";
         outfile.close();
@@ -112,9 +112,9 @@ namespace core{
     inline void CreateTestMainFile(const std::string& path){
         std::ofstream outfile(path + "/test.cc");
         outfile 
-            << "\n\n#include <iostream>"
+            << "#include <iostream>"
             << "\n\nint main(int argc, char** argv){"
-            << "\n\tstd::cout << \t\"Performing tests...\" << std::endl;"
+            << "\n\tstd::cout << Performing tests... << std::endl;"
             << "\n\n\treturn 0;"
             << "\n}";
         outfile.close();
@@ -131,9 +131,33 @@ namespace core{
     }
 
     inline void RemoveFolder(const std::string& path){
-        std::string command = "rm -r " + path + "> null && rm -r null";
+        std::string command;
+        #if defined(_WIN32)
+            command = "rmdir /q /s " + path + "> null && rmdir /q /s null"; // can be used on Windows
+        #else 
+            command = "rm -r " + path + "> null && rm -r null"; // can be used on Unix
+        #endif
         const char* command_cstr = command.c_str();
         system(command_cstr);
+    }
+
+    inline bool GetProjectName(std::string* out_project_name){
+        std::string line;
+        std::ifstream infile("./src/CMakeLists.txt", std::ios::in);
+        if (!infile) {
+            std::cerr << "Could not open the secondaries CMakeLists.txt files (inside src and test folders)\n";
+            return false;
+        }
+        std::getline(infile, line);
+        std::string project_name = line.substr(line.find("(")+1, line.length()-1);
+        project_name = project_name.substr(0, project_name.find(")"));
+        infile.close();
+        *out_project_name = project_name;
+        
+        if(project_name.length() > 0){
+            return true;
+        }
+        return false;
     }
 
     inline void AddModuleHeadersToMainCMakeListsFile(const std::string& path_module){
@@ -315,10 +339,8 @@ namespace core{
             return true;
         }else{
             if(line.find("|") != std::string::npos){
-                std::cout << "line : " << line << std::endl;
                 line = line.substr(0, line.find("|")+1) + "\t" + module_url;
             }else{
-                std::cout << "line : " << line << std::endl;
                 line += "\t|\t" + module_url;
             }
         }
@@ -340,7 +362,7 @@ namespace core{
         return true;
     }
 
-    inline void UpdateDependenciesFile(){
+    inline void UpdateDependenciesFile(const std::string& project_url = ""){
         std::string line;
         std::ifstream infile("./src/CMakeLists.txt", std::ios::in);
         if (!infile) {
@@ -355,7 +377,7 @@ namespace core{
         std::ofstream outfile("dependencies.bscxx");
         std::string body;
         body = "BSCXX_PROJECT:\n";
-        body += "\t[" + project_name + "]:^1.0.0\n\n";
+        body += "\t[" + project_name + "]:^1.0.0\t|\t" + project_url + "\n\n";
         body += "BSCXX_DEPENDENCIES:\n";
         for(const auto& p : std::experimental::filesystem::v1::directory_iterator("bscxx_modules")){
             std::string module_path = p.path().string();
@@ -372,6 +394,31 @@ namespace core{
         }
         outfile << body;
         outfile.close();      
+    }
+
+    inline bool UpdateGitUrlProject(){
+        std::string git_url_project;
+        std::experimental::filesystem::v1::path path_git_directory = ".git";
+        if(std::experimental::filesystem::v1::exists(path_git_directory)){
+            std::string line;
+            std::ifstream infile(".git/config", std::ios::in);
+            if (!infile) {
+                std::cerr << "Could not open the secondaries CMakeLists.txt files (inside src and test folders)\n";
+                return false;
+            }
+            std::size_t found_url;
+            while(!infile.eof()){
+                std::getline(infile, line);
+                found_url = line.find("url = ");
+                if(found_url != std::string::npos){ 
+                    git_url_project = line.substr(found_url + 6, line.length()-1);
+                }
+            }
+            infile.close();
+            UpdateDependenciesFile(git_url_project);
+            return true;
+        }
+        return false;
     }
 
     inline bool CreateSubdirectoryIncludeFolder(const std::string& module_path){
@@ -425,6 +472,32 @@ namespace core{
         std::experimental::filesystem::v1::copy(module_path, modules_folder + project_name, std::experimental::filesystem::v1::copy_options::recursive);
         AddDependencyUrlToModule(modules_folder + project_name, "local_module");
         CreateSubdirectoryIncludeFolder(modules_folder + project_name);
+    }
+
+    inline bool DownloadModules(){
+        std::string project_name;
+        GetProjectName(&project_name);
+
+        bool module_lines = false;
+        std::string line;
+        std::ifstream infile("dependencies.bscxx", std::ios::in);
+        if (!infile) {
+            std::cerr << "Could not open the dependencies.bscxx file\n";
+            return false;
+        }
+        while(!infile.eof()){
+            std::getline(infile, line);
+            if(module_lines){
+                std::string module_url = line.substr(line.find("|")+2, line.length()-1);
+                std::cout << module_url << std::endl;
+            }
+            if(line.compare("BSCXX_DEPENDENCIES:") == 0){
+                module_lines = true;
+            }
+        }
+        infile.close();
+
+        return true;
     }
 
 }// namespace core
