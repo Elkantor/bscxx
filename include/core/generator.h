@@ -153,9 +153,9 @@ namespace core{
         return false;
     }
 
-    inline bool GetProjectName(std::string* out_project_name){
+    inline bool GetProjectName(std::string* out_project_name, const std::string& path_project = "."){
         std::string line;
-        std::ifstream infile("./src/CMakeLists.txt", std::ios::in);
+        std::ifstream infile(path_project + "/src/CMakeLists.txt", std::ios::in);
         if (!infile) {
             std::cerr << "Could not open the secondaries CMakeLists.txt files (inside src and test folders)\n";
             return false;
@@ -172,10 +172,10 @@ namespace core{
         return false;
     }
 
-    inline void AddModuleHeadersToMainCMakeListsFile(const std::string& path_module){
+    inline void AddModuleHeadersToMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
         std::vector<std::string> lines;
         std::string line;
-        std::ifstream infile("./CMakeLists.txt", std::ios::in);
+        std::ifstream infile(main_path + "/CMakeLists.txt", std::ios::in);
         
         if (!infile) {
             std::cerr << "Could not open the main CMakeLists.txt file\n";
@@ -193,17 +193,17 @@ namespace core{
         }
         infile.close();
 
-        std::ofstream outfile("./CMakeLists.txt");
+        std::ofstream outfile(main_path + "/CMakeLists.txt");
         for(size_t i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
         outfile.close();
     }
 
-    inline void RemoveModuleHeadersFromMainCMakeListsFile(const std::string& path_module){
+    inline void RemoveModuleHeadersFromMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
         std::vector<std::string> lines;
         std::string line;
-        std::ifstream infile("./CMakeLists.txt", std::ios::in);
+        std::ifstream infile(main_path + "/CMakeLists.txt", std::ios::in);
         
         if (!infile) {
             std::cerr << "Could not open the main CMakeLists.txt file\n";
@@ -220,7 +220,7 @@ namespace core{
         }
         infile.close();
 
-        std::ofstream outfile("./CMakeLists.txt");
+        std::ofstream outfile(main_path + "/CMakeLists.txt");
         for(size_t i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
@@ -297,7 +297,7 @@ namespace core{
         while(!infile.eof()){
             std::getline(infile, line);
             if(lines.size() > 0){
-                if(line.compare("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "bscxx_modules/" + module_name + "/src/*)") == 0){
+                if(line.compare("\tfile (GLOB_RECURSE " + module_name + "_source_files " + "../bscxx_modules/" + module_name + "/src/*)") == 0){
                     continue;
                 }
                 if(count_lines_removing_main_file > 0){
@@ -400,7 +400,7 @@ namespace core{
             }
             std::getline(infile_module, line_module);
             std::getline(infile_module, line_module);
-            body += line_module;
+            body += line_module + "\n";
             infile_module.close();
         }
         outfile << body;
@@ -452,7 +452,31 @@ namespace core{
         return false;
     }
 
-    inline bool AddGithubModule(const std::string& github_url, const std::string& module_path){
+    inline bool MoveSubModulesToMainBSCXXDirectory(const std::string& module_path){
+        for(const auto& module : std::experimental::filesystem::v1::directory_iterator(module_path + "/bscxx_modules")){
+            std::string submodule_name;
+            GetProjectName(&submodule_name, module.path().string());
+            if(!std::experimental::filesystem::v1::exists("./bscxx_modules/" + submodule_name)){
+                CreateFolder("./bscxx_modules/" + submodule_name);
+                std::experimental::filesystem::v1::copy(module_path + "/bscxx_modules/" + submodule_name, "./bscxx_modules/" + submodule_name, std::experimental::filesystem::v1::copy_options::recursive);
+            }
+            RemoveModuleHeadersFromMainCMakeListsFile("bscxx_modules/" + submodule_name, module_path);
+            RemoveModuleSourceFilesToSecondaryCmakeListsFile(submodule_name, module_path + "/src");
+            RemoveModuleSourceFilesToSecondaryCmakeListsFile(submodule_name, module_path + "/test");
+            AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + submodule_name);
+            AddModuleSourceFilesToSecondaryCMakeListsFile(submodule_name, "src");
+            AddModuleSourceFilesToSecondaryCMakeListsFile(submodule_name, "test");
+            if(!RemoveFolder(module_path + "/bscxx_modules/" + submodule_name)){
+                return false;
+            }
+        }
+        if(!RemoveFolder(module_path + "/bscxx_modules")){
+            return false;
+        }
+        return true;
+    }
+
+    inline bool AddGithubModule(const std::string& github_url, const std::string& module_path, std::string* out_module_name){
         std::string final_path_module = module_path + github_url.substr(github_url.find("/")+1, github_url.length()-1);
         std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + "> null && rm -r null";
         system(command.c_str());
@@ -461,21 +485,33 @@ namespace core{
             return false;
         }
         RemoveFolder(final_path_module + "/.git");
+        std::string module_name;
+        GetProjectName(&module_name, final_path_module);
+        std::cout << "Module name : " << module_name << std::endl;
+        CreateFolder("./bscxx_modules/" + module_name);
+        std::experimental::filesystem::v1::copy(final_path_module, "./bscxx_modules/" + module_name, std::experimental::filesystem::v1::copy_options::recursive);
+        RemoveFolder(final_path_module);
+        final_path_module = module_path + "/" + module_name;
         AddDependencyUrlToModule(final_path_module, "http://github.com/" + github_url);
         CreateSubdirectoryIncludeFolder(final_path_module);
+        MoveSubModulesToMainBSCXXDirectory(final_path_module);
+        *out_module_name = module_name;
         return true;
     }
 
-    inline void AddLocalModule(
+    inline bool AddLocalModule(
         const std::string& module_path, 
         const std::string& modules_folder,
         std::string* out_module_name
     ){
+        if(!std::experimental::filesystem::v1::exists(module_path + "/dependencies.bscxx")){
+            return false;
+        }
         std::string line;
         std::ifstream infile(module_path + "/src/CMakeLists.txt", std::ios::in);
         if (!infile) {
             std::cerr << "Could not open the CMakeLists.txt file (inside the " + module_path + "/src folder)\n";
-            return;
+            return false;
         }
         std::getline(infile, line);
         std::string project_name = line.substr(line.find("(")+1, line.length()-1);
@@ -484,10 +520,11 @@ namespace core{
         infile.close();
         std::cout << "Adding " + project_name + " module..." << std::endl;
         CreateFolder(modules_folder + project_name);
-        RemoveFolder(modules_folder + project_name);
         std::experimental::filesystem::v1::copy(module_path, modules_folder + project_name, std::experimental::filesystem::v1::copy_options::recursive);
         AddDependencyUrlToModule(modules_folder + project_name, "local_module");
         CreateSubdirectoryIncludeFolder(modules_folder + project_name);
+        MoveSubModulesToMainBSCXXDirectory(modules_folder + project_name);
+        return true;
     }
 
     inline bool InitializeGit(){

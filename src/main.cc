@@ -116,10 +116,9 @@ int main(int argc, char* argv[]){
                 /*****************************/
                 else if(strcmp(argv[2], "--github") == 0){
                     if(argv[3] != nullptr){
-                        std::string module_name = argv[3];
-                        module_name = module_name.substr(module_name.find("/")+1, module_name.length()-1);
+                        std::string module_name;
                         core::CreateFolder("bscxx_modules");
-                        if(!core::AddGithubModule(argv[3], "bscxx_modules/")){
+                        if(!core::AddGithubModule(argv[3], "bscxx_modules/", &module_name)){
                             std::cout << "Not a bscxx module repository.\n";
                             return false;
                         }
@@ -138,7 +137,10 @@ int main(int argc, char* argv[]){
                     if(argv[3] != nullptr){
                         std::string module_name;
                         core::CreateFolder("bscxx_modules");
-                        core::AddLocalModule(argv[3], "./bscxx_modules/", &module_name);
+                        if(!core::AddLocalModule(argv[3], "./bscxx_modules/", &module_name)){
+                            std::cout << "No module available for this path.\n";
+                            return false;
+                        }
                         core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
                         core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
                         core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
@@ -188,6 +190,7 @@ int main(int argc, char* argv[]){
                     core::RemoveFolder("bscxx_modules/" + module_name);
                     core::RemoveModuleHeadersFromMainCMakeListsFile("bscxx_modules/" + module_name);
                     core::RemoveModuleSourceFilesToSecondaryCmakeListsFile(module_name, "src");
+                    core::RemoveModuleSourceFilesToSecondaryCmakeListsFile(module_name, "test");
                     core::UpdateDependenciesFile();  
                 }
             }
