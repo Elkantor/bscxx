@@ -5,8 +5,11 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
-#include <experimental/filesystem> 
-#include <filesystem>
+#include <experimental/filesystem>
+#ifdef _MSC_VER
+    #include <filesystem>
+#endif 
+
 
 #if defined(_WIN32)
     #include <direct.h>

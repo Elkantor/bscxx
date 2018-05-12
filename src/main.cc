@@ -211,7 +211,7 @@ int main(int argc, char* argv[]){
                 << "\n\nCommands:"
                 << "\n\ncreate\tCreate a new C++ project"
                 << "\nadd\tAdd a C++ module to the project dependencies"
-                << "\nremove\tRemove a C++ module from the project dependencies\n"
+                << "\nremove\tRemove a C++ module from the project dependencies"
                 << "\nupdate\tUpdate the url of this project in the dependencies file (dependencies.bscxx)\n"
                 << "\nSee the help for more details : bscxx [command] --help\n";
         }
@@ -225,7 +225,7 @@ int main(int argc, char* argv[]){
                 << "\n\nAvailable commands:"
                 << "\n\ncreate\tCreate a new C++ project"
                 << "\nadd\tAdd a C++ module in the project dependencies"
-                << "\nremove\tRemove a C++ module from the project dependencies\n"
+                << "\nremove\tRemove a C++ module from the project dependencies"
                 << "\nupdate\tUpdate the url of this project in the dependencies file (dependencies.bscxx)\n"
                 << "\nSee the help for more details : bscxx [command] --help\n";
         }
