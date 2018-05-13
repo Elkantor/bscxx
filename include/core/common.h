@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <thread>
+#include <algorithm>
 #include <experimental/filesystem>
 #ifdef _MSC_VER
     #include <filesystem>

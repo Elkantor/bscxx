@@ -103,7 +103,7 @@ namespace core{
         outfile 
             << "#include <iostream>"
             << "\n\nint main(int argc, char** argv){"
-            << "\n\tstd::cout << Running the app... << std::endl;"
+            << "\n\tstd::cout << \"Running the app...\" << std::endl;"
             << "\n\n\treturn 0;"
             << "\n}";
         outfile.close();
@@ -114,7 +114,7 @@ namespace core{
         outfile 
             << "#include <iostream>"
             << "\n\nint main(int argc, char** argv){"
-            << "\n\tstd::cout << Performing tests... << std::endl;"
+            << "\n\tstd::cout << \"Performing tests...\" << std::endl;"
             << "\n\n\treturn 0;"
             << "\n}";
         outfile.close();
@@ -432,6 +432,124 @@ namespace core{
         return false;
     }
 
+    inline bool AddPrenameToHeaderFiles(
+        const std::vector<std::string>& include_files,
+        const std::string& module_path,
+        const std::string& module_name
+    ){
+        for(auto& p : std::experimental::filesystem::v1::recursive_directory_iterator(module_path + "/include/" + module_name)){
+            std::string body;
+            std::string file_name = p.path().string();
+            std::string extension_file = p.path().string().substr(file_name.find_last_of(".") + 1);
+            if(extension_file == "h" || extension_file == "hpp"){
+                std::string line;
+                std::ifstream infile(file_name, std::ios::in);
+                if (!infile) {
+                    std::cerr << "Could not open the include files of the " + module_name + " module.\n";
+                    return false;
+                }
+                while(!infile.eof()){
+                    std::getline(infile, line);
+                    std::size_t found_header;
+                    found_header = line.find("#include");
+                    if(found_header != std::string::npos){
+                        std::for_each(include_files.begin(), include_files.end(), [&](const std::string& name){
+                            std::size_t found_include_file;
+                            found_include_file = line.find(name);
+                            if(found_include_file != std::string::npos){
+                                std::string from = name;
+                                std::string to = module_name + "/" + name;
+                                size_t start_pos = 0;
+                                while((start_pos = line.find(from, start_pos)) != std::string::npos) {
+                                    line.replace(start_pos, from.length(), to);
+                                    start_pos += to.length();
+                                }
+                            }
+                        });
+                    }
+                    body += line + "\n";
+                }
+                infile.close();
+                std::ofstream outfile(file_name);
+                outfile << body;
+                outfile.close();
+            }
+        }
+        return true;
+    }
+
+    inline bool AddPrenameToSourceFiles(
+        const std::vector<std::string>& include_files,
+        const std::string& module_path,
+        const std::string& module_name
+    ){
+        for(auto& p : std::experimental::filesystem::v1::recursive_directory_iterator(module_path + "/src")){
+            std::string body;
+            std::string file_name = p.path().string();
+            std::string extension_file = p.path().string().substr(file_name.find_last_of(".") + 1);
+            if(extension_file == "cc" || extension_file == "cpp" || extension_file == "cxx" || extension_file == "c"){
+                std::string line;
+                std::ifstream infile(file_name, std::ios::in);
+                if (!infile) {
+                    std::cerr << "Could not open the source files of the " + module_name + " module.\n";
+                    return false;
+                }
+                while(!infile.eof()){
+                    std::getline(infile, line);
+                    std::size_t found_header;
+                    found_header = line.find("#include");
+                    if(found_header != std::string::npos){
+                        std::for_each(include_files.begin(), include_files.end(), [&](const std::string& name){
+                            std::size_t found_include_file;
+                            found_include_file = line.find(name);
+                            if(found_include_file != std::string::npos){
+                                std::string from = name;
+                                std::string to = module_name + "/" + name;
+                                size_t start_pos = 0;
+                                while((start_pos = line.find(from, start_pos)) != std::string::npos) {
+                                    line.replace(start_pos, from.length(), to);
+                                    start_pos += to.length();
+                                }
+                            }
+                        });
+                    }
+                    body += line + "\n";
+                }
+                infile.close();
+                std::ofstream outfile(file_name);
+                outfile << body;
+                outfile.close();
+            }
+        }
+        return true;
+    }
+
+    inline bool ModifyIncludeHeadersSourceFiles(const std::string& module_path, const std::string& module_name){
+        std::vector<std::string> include_files;
+        for(const auto& p : std::experimental::filesystem::v1::recursive_directory_iterator(module_path + "/include/" + module_name)){
+            std::string file_name = p.path().string();
+            file_name = file_name.substr(file_name.find("include") + 8 + module_name.length()+1, file_name.length()-1);
+            std::string from = "\\";
+            std::string to = "/";
+            size_t start_pos = 0;
+            while((start_pos = file_name.find(from, start_pos)) != std::string::npos) {
+                file_name.replace(start_pos, from.length(), to);
+                start_pos += to.length();
+            }
+            std::string file_extension = file_name.substr(file_name.find_last_of(".") + 1);
+            if(file_extension == "h" || file_extension == "hpp"){
+                include_files.emplace_back(file_name);
+            }
+        }
+
+        std::thread replace_headers(AddPrenameToHeaderFiles, include_files, module_path, module_name);
+        std::thread replace_sources(AddPrenameToSourceFiles, include_files, module_path, module_name);
+        replace_headers.join();
+        replace_sources.join();
+        
+        return true;
+    }
+
     inline bool CreateSubdirectoryIncludeFolder(const std::string& module_path){
         std::string module_name = module_path.substr(module_path.find("/", 14)+1, module_path.length()-1);
         std::string new_include_path = module_path + "/include/" + module_name;
@@ -446,7 +564,7 @@ namespace core{
             if(!RemoveFolder(module_path + '/' + module_name)){
                 return false;
             }
-            
+            ModifyIncludeHeadersSourceFiles(module_path, module_name);
             return true;
         }
         return false;
@@ -487,7 +605,7 @@ namespace core{
         RemoveFolder(final_path_module + "/.git");
         std::string module_name;
         GetProjectName(&module_name, final_path_module);
-        std::cout << "Module name : " << module_name << std::endl;
+        std::cout << "Module name : " << module_name + "\n";
         CreateFolder("./bscxx_modules/" + module_name);
         std::experimental::filesystem::v1::copy(final_path_module, "./bscxx_modules/" + module_name, std::experimental::filesystem::v1::copy_options::recursive);
         RemoveFolder(final_path_module);
