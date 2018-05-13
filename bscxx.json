@@ -1,6 +1,6 @@
 {
     "version": "0.1.0",
-    "url": "https://github.com/Elkantor/bscxx/releases/download/0.1.1/bscxx.zip",
+    "url": "https://github.com/Elkantor/bscxx/releases/download/0.1.2/bscxx.zip",
     "bin": "bscxx.exe",
     "licence": "MIT"
 }
