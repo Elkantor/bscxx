@@ -1,3 +1,5 @@
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
 # bscxx
 > bscxx (for bootstrap CXX project) is a very light utility software, written in C++ 17, to help you starting quickly a new C++ project using cmake. 
 Its end goal is to be a package manager, to easily include C++ modules to your project, deeply inspired by npm (node.js), composer (php) and cargo (rust).
