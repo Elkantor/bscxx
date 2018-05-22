@@ -85,7 +85,7 @@ And finally, launch the app to test it if everything compiled fine:
 This project follow some rules, to be as consistent and comprehensible as possible.
 
 * [semver](https://semver.org/), for the version of the package.
-* [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) : I do my best to try to conform to the Google C++ Style Guide.
+* [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html) : I do my best to try to conform to the Google C++ Style Guide, with only one exception: I use 4 spaces for indentations instead of 2.
 
 ## Licencing
 
