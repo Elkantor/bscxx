@@ -155,7 +155,7 @@ int main(int argc, char* argv[]){
         /* Install the dependencies */
         /****************************/
         else if(strcmp(argv[1], "install") == 0){
-            
+            core::DownloadModules();
         }
 
         /********************************/

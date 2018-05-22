@@ -664,6 +664,7 @@ namespace core{
         std::string project_name;
         GetProjectName(&project_name);
 
+        std::vector<std::string> modules_url;
         bool module_lines = false;
         std::string line;
         std::ifstream infile("dependencies.bscxx", std::ios::in);
@@ -674,7 +675,11 @@ namespace core{
         while(!infile.eof()){
             std::getline(infile, line);
             if(module_lines){
-                std::string module_url = line.substr(line.find("|")+2, line.length()-1);
+                size_t pos_separator = line.find("|");
+                if(pos_separator != std::string::npos){
+                    std::string module_url = line.substr(pos_separator + 2, line.length()-1);
+                    modules_url.emplace_back(module_url);
+                }
             }
             if(line.compare("BSCXX_DEPENDENCIES:") == 0){
                 module_lines = true;
@@ -682,6 +687,18 @@ namespace core{
         }
         infile.close();
 
+        for(const auto& s : modules_url){
+            if(s.length()-1 > 1){
+                std::string module_url_reduced = s.substr(s.find(".com")+5, s.length()-1);
+                std::string module_name;
+                CreateFolder("bscxx_modules");
+                if(!AddGithubModule(module_url_reduced, "bscxx_modules/", &module_name)){
+                    std::cout << "Not a bscxx module repository.\n";
+                    return false;
+                }
+                std::cout << "Module correclty added, project updated.\n";
+            }
+        }
         return true;
     }
 
