@@ -78,6 +78,7 @@ And finally, launch the app to test it if everything compiled fine:
 
 * [CMake](https://cmake.org/)
 * C++ 17
+* Lots of coffee
 
 ### Rules / Coding Standard
 
