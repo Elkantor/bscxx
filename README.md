@@ -4,7 +4,7 @@ Its end goal is to be a package manager, to easily include C++ modules to your p
 
 ## Prerequisite
 
-To be able to build this project, you need a compiler compatible with the last C++ 17 features, such as "filesystem". 
+To be able to build this project, you need a compiler which supports the last C++ 17 features, such as "filesystem". 
 So you'll need Visual Studio 17 or GCC 8 for example, at least, to be able to build this project from source.
 
 ## Installing / Getting started
