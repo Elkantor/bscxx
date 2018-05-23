@@ -64,7 +64,7 @@ cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE:STRING=Release
 
 And finally, launch the app to test it if everything compiled fine:
 ```shell
-../build/test/bin/Release/bscxx -h
+../build/src/bin/Release/bscxx -h
 ```
 
 ## Documentation 
