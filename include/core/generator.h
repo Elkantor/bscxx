@@ -594,6 +594,33 @@ namespace core{
         return true;
     }
 
+    inline bool AddZipModule(const std::string& url, const std::string& module_path, std::string* out_module_name){
+        std::string command;
+        #if defined(_WIN32)
+            command = "(for /f \"delims=\" %a in ('where git') do echo %~dpa > git_location.txt) > nul";
+            system(command.c_str());
+            std::string line;
+            std::ifstream infile("git_location.txt", std::ios::in);
+            if (!infile) {
+                std::cerr << "Could not open the git_location.txt file\n";
+                return false;
+            }
+            std::getline(infile, line);
+            infile.close();
+            line.erase(line.end()-1, line.end());
+            command = "echo. && \"" + line + "..\\mingw64\\bin\\curl.exe\" -k " + url + " > module.zip && echo."; 
+            command += " && \"" + line + "..\\usr\\bin\\unzip.exe\" -q module.zip -d bscxx_modules";
+            command += " && del git_location.txt && del module.zip";
+        #else 
+            command = "curl --v"; // can be used on Unix
+        #endif
+        system(command.c_str());
+        // if(!std::experimental::filesystem::v1::exists("./bscxx_modules/" +  + "/dependencies.bscxx")){
+        //     return false;
+        // }
+        return true;
+    }
+
     inline bool AddGithubModule(const std::string& github_url, const std::string& module_path, std::string* out_module_name){
         std::string final_path_module = module_path + github_url.substr(github_url.find("/")+1, github_url.length()-1);
         std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + "> null && rm -r null";
