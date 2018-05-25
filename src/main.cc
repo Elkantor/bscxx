@@ -157,13 +157,13 @@ int main(int argc, char* argv[]){
                         std::string module_name;
                         core::CreateFolder("bscxx_modules");
                         if(!core::AddZipModule(argv[3], "bscxx_modules/", &module_name)){
-                            std::cout << "Not a bscxx module repository.\n";
+                            std::cout << "Error: Not a bscxx module repository.\n";
                             return false;
                         }
-                        // core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
-                        // core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
-                        // core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
-                        // core::UpdateDependenciesFile();
+                        core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
+                        core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
+                        core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
+                        core::UpdateDependenciesFile();
                         std::cout << "Module correclty added, project updated.\n";
                     }
                 }

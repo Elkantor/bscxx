@@ -608,16 +608,33 @@ namespace core{
             std::getline(infile, line);
             infile.close();
             line.erase(line.end()-1, line.end());
-            command = "echo. && \"" + line + "..\\mingw64\\bin\\curl.exe\" -k " + url + " > module.zip && echo."; 
-            command += " && \"" + line + "..\\usr\\bin\\unzip.exe\" -q module.zip -d bscxx_modules";
-            command += " && del git_location.txt && del module.zip";
+            
+            std::string full_url = url;
+            if(full_url.at(4) != 's'){
+                full_url.insert(4, "s");
+            }
+
+            CreateFolder("./new_module");
+            command = "echo. && cd new_module && \"" + line + "..\\mingw64\\bin\\curl.exe\" -# -k -O -J " + full_url + " && cd ..";
+            system(command.c_str());
+            std::string module_name;
+            std::string module_path_zip;
+            for(const auto& p : std::experimental::filesystem::v1::directory_iterator("new_module")){
+                module_path_zip = p.path().string();
+                if(!GetProjectName(&module_name, module_path)){
+                    RemoveFolder("./new_module");
+                    command = "del git_location.txt /s /q > nul";
+                    system(command.c_str());
+                    return false;
+                }
+            }
+            std::cout << "Module name: " << module_name << "\n";
+            command = "\"" + line + "..\\usr\\bin\\unzip.exe\" -q " + module_path_zip + " -d bscxx_modules";
+            command += " && del git_location.txt /s /q > nul && del new_module /s /q > nul";
+            system(command.c_str());
         #else 
-            command = "curl --v"; // can be used on Unix
+            command = "curl --v"; 
         #endif
-        system(command.c_str());
-        // if(!std::experimental::filesystem::v1::exists("./bscxx_modules/" +  + "/dependencies.bscxx")){
-        //     return false;
-        // }
         return true;
     }
 
@@ -632,7 +649,7 @@ namespace core{
         RemoveFolder(final_path_module + "/.git");
         std::string module_name;
         GetProjectName(&module_name, final_path_module);
-        std::cout << "Module name : " << module_name + "\n";
+        std::cout << "Module name: " << module_name + "\n";
         CreateFolder("./bscxx_modules/" + module_name);
         std::experimental::filesystem::v1::copy(final_path_module, "./bscxx_modules/" + module_name, std::experimental::filesystem::v1::copy_options::recursive);
         RemoveFolder(final_path_module);
