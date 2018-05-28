@@ -25,7 +25,7 @@ namespace core{
         return current_working_dir;
     }
 
-    inline void CreateMainCmakeListsFile(const std::string& path){
+    inline bool CreateMainCmakeListsFile(const std::string& path){
         std::ofstream outfile(path + "CMakeLists.txt");
         outfile 
             << "cmake_minimum_required (VERSION 3.9)"
@@ -41,6 +41,11 @@ namespace core{
             << "\n\tadd_subdirectory (test)"
             << "\n## End of adding executables ##";
         outfile.close();
+        
+        if(!std::experimental::filesystem::v1::exists(path + "CMakeLists.txt")){
+            return false;
+        }
+        return true;
     }
 
     inline void CreateSecondaryCMakeListsFile(
@@ -98,7 +103,7 @@ namespace core{
         outfile.close();
     }
 
-    inline void CreateMainFile(const std::string& path){
+    inline bool CreateMainFile(const std::string& path){
         std::ofstream outfile(path + "/main.cc");
         outfile 
             << "#include <iostream>"
@@ -107,9 +112,14 @@ namespace core{
             << "\n\n\treturn 0;"
             << "\n}";
         outfile.close();
+
+        if(!std::experimental::filesystem::v1::exists(path + "/main.cc")){
+            return false;
+        }
+        return true;
     }
 
-    inline void CreateTestMainFile(const std::string& path){
+    inline bool CreateTestMainFile(const std::string& path){
         std::ofstream outfile(path + "/test.cc");
         outfile 
             << "#include <iostream>"
@@ -118,9 +128,14 @@ namespace core{
             << "\n\n\treturn 0;"
             << "\n}";
         outfile.close();
+
+        if(!std::experimental::filesystem::v1::exists(path + "/test.cc")){
+            return false;
+        }
+        return true;
     }
 
-    inline void CreateFolder(const std::string& path){
+    inline bool CreateFolder(const std::string& path){
         int error = 0;
         #if defined(_WIN32)
             error = _mkdir(path.c_str()); // can be used on Windows
@@ -128,6 +143,10 @@ namespace core{
             mode_t mode = 0733;
             error = mkdir(path.c_str(), mode); // can be used on Unix
         #endif
+        if(!std::experimental::filesystem::v1::exists(path)){
+            return false;
+        }
+        return true;
     }
 
     inline bool RemoveFolder(const std::string& path){
@@ -690,9 +709,8 @@ namespace core{
     }
 
     inline bool InitializeGit(){
-        std::string command = "git init >> NULL";
+        std::string command = "git init > nul";
         system(command.c_str());
-        std::experimental::filesystem::v1::remove("./NULL");
 
         // Create the gitignore file
         std::ofstream outfile(".gitignore");
@@ -701,6 +719,11 @@ namespace core{
         body += "# Build folder\nbuild\n\n";
         outfile << body;
         outfile.close();
+
+        if(!std::experimental::filesystem::v1::exists(".git")){
+            return false;
+        }
+
         return true;
     }
 
