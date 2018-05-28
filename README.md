@@ -1,4 +1,5 @@
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![Build status](https://ci.appveyor.com/api/projects/status/79o8ckxl0vnq2b85?svg=true)](https://ci.appveyor.com/project/Elkantor/bscxx)
+
 
 # bscxx
 > bscxx (for bootstrap CXX project) is a very light utility software, written in C++ 17, to help you starting quickly a new C++ project using cmake. 
