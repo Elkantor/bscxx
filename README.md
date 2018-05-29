@@ -71,9 +71,11 @@ And finally, launch the app to test it if everything compiled fine:
 ## Documentation 
 
 <blockquote>
-<p><g-emoji class="g-emoji" alias="bulb" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png" ios-version="6.0"><img class="emoji" alt="bulb" height="20" width="20" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png"></g-emoji> [Warning] bscxx is a young WIP project, so the documentation is not available for now, but will be released as soon as possible.
+<p><g-emoji class="g-emoji" alias="bulb" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png" ios-version="6.0"><img class="emoji" alt="bulb" height="20" width="20" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png"></g-emoji> [Warning] bscxx is a young WIP project, so the documentation is not fully available for now, but will be released as soon as possible.
 </p>
 </blockquote>
+
+* [Getting started](./doc/getting_started.md)
 
 ## Developing
 
