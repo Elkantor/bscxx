@@ -76,57 +76,70 @@ int main(int argc, char* argv[]){
                         << "\nAdd a C++ module in the project's dependencies (located in ./bscxx_modules)"
                         << "\n\nUsage: bscxx add [OPTION] [module_name]"
                         << "\n\nOptions:"
-                        << "\n\t--local\tAdd a new module from a local folder"
+                        << "\n\t--local \tAdd a new module from a local folder"
                         << "\n\t--github\tAdd a new module from a github repository"
+                        << "\n\t--zip   \tAdd a new module from a zip url"
                         << "\n";
                 }
 
-                /****************************/
-                /* If creating a new module */
-                /****************************/
-                else if(strcmp(argv[2], "--new") == 0 || strcmp(argv[2], "-n") == 0){
-                    /*************************/
-                    /* Show the help command */
-                    /*************************/
-                    if(strcmp(argv[3], "-h") == 0 || strcmp(argv[3], "--help") == 0){
-                        std::cout 
-                            << "\nCreate a new skeleton of a C++ module in the project's dependencies (located in ./bscxx_modules)"
-                            << "\n\nUsage: bscxx add --new [module_name]"
-                            << "\n";
-                    }
-                    core::CreateFolder("bscxx_modules");
-                    core::CreateFolder("bscxx_modules/" + module_name);
-                    core::CreateMainCmakeListsFile("./bscxx_modules/" + module_name + "/");
-                    core::CreateFolder("bscxx_modules/" + module_name + "/src");
-                    core::CreateFolder("bscxx_modules/" + module_name + "/include");
-                    core::CreateSubdirectoryIncludeFolder("bscxx_modules/" + module_name);
-                    core::CreateFolder("bscxx_modules/" + module_name + "/test");
-                    core::CreateMainFile("bscxx_modules/" + module_name + "/src");
-                    core::CreateTestMainFile("bscxx_modules/" + module_name + "/test");
-                    core::CreateSecondaryCMakeListsFile("bscxx_modules/" + module_name + "/src", module_name);
-                    core::CreateSecondaryCMakeListsFile("bscxx_modules/" + module_name + "/test", module_name);
-                    core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
-                    core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
-                    core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
-                    core::UpdateDependenciesFile();
-                }
+                // /****************************/
+                // /* If creating a new module */
+                // /****************************/
+                // else if(strcmp(argv[2], "--new") == 0 || strcmp(argv[2], "-n") == 0){
+                //     /*************************/
+                //     /* Show the help command */
+                //     /*************************/
+                //     if(strcmp(argv[3], "-h") == 0 || strcmp(argv[3], "--help") == 0){
+                //         std::cout 
+                //             << "\nCreate a new skeleton of a C++ module in the project's dependencies (located in ./bscxx_modules)"
+                //             << "\n\nUsage: bscxx add --new [module_name]"
+                //             << "\n";
+                //     }
+                //     core::CreateFolder("bscxx_modules");
+                //     core::CreateFolder("bscxx_modules/" + module_name);
+                //     core::CreateMainCmakeListsFile("./bscxx_modules/" + module_name + "/");
+                //     core::CreateFolder("bscxx_modules/" + module_name + "/src");
+                //     core::CreateFolder("bscxx_modules/" + module_name + "/include");
+                //     core::CreateSubdirectoryIncludeFolder("bscxx_modules/" + module_name);
+                //     core::CreateFolder("bscxx_modules/" + module_name + "/test");
+                //     core::CreateMainFile("bscxx_modules/" + module_name + "/src");
+                //     core::CreateTestMainFile("bscxx_modules/" + module_name + "/test");
+                //     core::CreateSecondaryCMakeListsFile("bscxx_modules/" + module_name + "/src", module_name);
+                //     core::CreateSecondaryCMakeListsFile("bscxx_modules/" + module_name + "/test", module_name);
+                //     core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
+                //     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
+                //     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
+                //     core::UpdateDependenciesFile();
+                // }
 
                 /*****************************/
                 /* If adding a github module */
                 /*****************************/
                 else if(strcmp(argv[2], "--github") == 0){
                     if(argv[3] != nullptr){
-                        std::string module_name;
-                        core::CreateFolder("bscxx_modules");
-                        if(!core::AddGithubModule(argv[3], "bscxx_modules/", &module_name)){
-                            std::cout << "Not a bscxx module repository.\n";
-                            return false;
+                        /*************************/
+                        /* Show the help command */
+                        /*************************/
+                        if(strcmp(argv[3], "-h") == 0 || strcmp(argv[3], "--help") == 0){
+                            std::cout 
+                                << "\nAdd a C++ module from github in the project's dependencies (located in ./bscxx_modules)"
+                                << "\n\nNote: if the github project's url is \"https://github.com/Elkantor/bscxx\" for example"
+                                << " the github_path is \"Elkantor/bscxx\".\n"
+                                << "\n\nUsage: bscxx add --github [github_path]"
+                                << "\n";
+                        }else{
+                            std::string module_name;
+                            core::CreateFolder("bscxx_modules");
+                            if(!core::AddGithubModule(argv[3], "bscxx_modules/", &module_name)){
+                                std::cout << "Not a bscxx module repository.\n";
+                                return false;
+                            }
+                            core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
+                            core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
+                            core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
+                            core::UpdateDependenciesFile();
+                            std::cout << "Module correclty added, project updated.\n";
                         }
-                        core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
-                        core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
-                        core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
-                        core::UpdateDependenciesFile();
-                        std::cout << "Module correclty added, project updated.\n";
                     }
                 }
 
@@ -231,6 +244,7 @@ int main(int argc, char* argv[]){
                 << "\n\ncreate\tCreate a new C++ project"
                 << "\nadd\tAdd a C++ module to the project dependencies"
                 << "\nremove\tRemove a C++ module from the project dependencies"
+                << "\ninstall\tInstall the modules dependencies"
                 << "\nupdate\tUpdate the url of this project in the dependencies file (dependencies.bscxx)\n"
                 << "\nSee the help for more details : bscxx [command] --help\n";
         }
@@ -245,6 +259,7 @@ int main(int argc, char* argv[]){
                 << "\n\ncreate\tCreate a new C++ project"
                 << "\nadd\tAdd a C++ module in the project dependencies"
                 << "\nremove\tRemove a C++ module from the project dependencies"
+                << "\ninstall\tInstall the modules dependencies"
                 << "\nupdate\tUpdate the url of this project in the dependencies file (dependencies.bscxx)\n"
                 << "\nSee the help for more details : bscxx [command] --help\n";
         }
