@@ -48,7 +48,7 @@ namespace core{
         return true;
     }
 
-    inline void CreateSecondaryCMakeListsFile(
+    inline bool CreateSecondaryCMakeListsFile(
         const std::string& path, 
         const std::string& project_name, 
         const ProjectType project_type = ProjectType::EXECUTABLE
@@ -79,9 +79,14 @@ namespace core{
             << "\n\t" << type_project
             << "\n## End of adding executables ##";
         outfile.close();
+
+        if(!std::experimental::filesystem::v1::exists(path + "/CMakeLists.txt")){
+            return false;
+        }
+        return true;
     }
 
-    inline void CreateTestCMakeListsFile(const std::string& path, const std::string& project_name){
+    inline bool CreateTestCMakeListsFile(const std::string& path, const std::string& project_name){
         std::ofstream outfile(path + "/CMakeLists.txt");
         outfile
             << "project(" << "test_" << project_name << ")"
@@ -101,6 +106,11 @@ namespace core{
             << "\n\tadd_executable (test_" << project_name << " ${testing_files} ${testing_source_files})"
             << "\n## End of adding executables ##";
         outfile.close();
+
+        if(!std::experimental::filesystem::v1::exists(path + "/CMakeLists.txt")){
+            return false;
+        }
+        return true;
     }
 
     inline bool CreateMainFile(const std::string& path){
@@ -167,6 +177,7 @@ namespace core{
                 command = "rm -rf " + path; // can be used on Unix
             #endif
             system(command.c_str());
+            
             return true;
         }
         return false;
@@ -191,14 +202,14 @@ namespace core{
         return false;
     }
 
-    inline void AddModuleHeadersToMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
+    inline bool AddModuleHeadersToMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
         std::vector<std::string> lines;
         std::string line;
         std::ifstream infile(main_path + "/CMakeLists.txt", std::ios::in);
         
         if (!infile) {
             std::cerr << "Could not open the main CMakeLists.txt file\n";
-            return;
+            return false;
         }
 
         while(!infile.eof()){
@@ -212,21 +223,30 @@ namespace core{
         }
         infile.close();
 
+        if(lines.size() == 0){
+            return false;
+        }
+
         std::ofstream outfile(main_path + "/CMakeLists.txt");
         for(size_t i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
         outfile.close();
+
+        if(!std::experimental::filesystem::v1::exists(main_path + "/CMakeLists.txt")){
+            return false;
+        }
+        return true;
     }
 
-    inline void RemoveModuleHeadersFromMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
+    inline bool RemoveModuleHeadersFromMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
         std::vector<std::string> lines;
         std::string line;
         std::ifstream infile(main_path + "/CMakeLists.txt", std::ios::in);
         
         if (!infile) {
             std::cerr << "Could not open the main CMakeLists.txt file\n";
-            return;
+            return false;
         }
 
         while(!infile.eof()){
@@ -239,14 +259,23 @@ namespace core{
         }
         infile.close();
 
+        if(lines.size() == 0){
+            return false;
+        }
+
         std::ofstream outfile(main_path + "/CMakeLists.txt");
         for(size_t i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == lines.size()-1) ? "" : "\n");
         }
         outfile.close();
+
+        if(!std::experimental::filesystem::v1::exists(main_path + "/CMakeLists.txt")){
+            return false;
+        }
+        return true;
     }
 
-    inline void AddModuleSourceFilesToSecondaryCMakeListsFile(
+    inline bool AddModuleSourceFilesToSecondaryCMakeListsFile(
         const std::string& module_name, 
         const std::string& source_folder
     ){
@@ -256,7 +285,7 @@ namespace core{
         std::ifstream infile(source_folder + "/CMakeLists.txt", std::ios::in);
         if (!infile) {
             std::cerr << "Could not open the secondaries (inside src and test folders) CMakeLists.txt files\n";
-            return;
+            return false;
         }
         
         while(!infile.eof()){
@@ -292,11 +321,20 @@ namespace core{
         }
         infile.close();
 
+        if(lines.size() == 0){
+            return false;
+        }
+
         std::ofstream outfile("./" + source_folder + "/CMakeLists.txt");
         for(size_t i = 0; i < lines.size(); i++){
             outfile << lines.at(i) << ((i == (int)lines.size()-1) ? "" : "\n");
         }
         outfile.close();
+
+        if(!std::experimental::filesystem::v1::exists("./" + source_folder + "/CMakeLists.txt")){
+            return false;
+        }
+        return true;
     }
 
     inline void RemoveModuleSourceFilesToSecondaryCmakeListsFile(
@@ -392,24 +430,28 @@ namespace core{
         return true;
     }
 
-    inline void UpdateDependenciesFile(const std::string& project_url = ""){
+    inline bool UpdateDependenciesFile(const std::string& project_url = "", const std::string& project_path = "./"){
         std::string line;
-        std::ifstream infile("./src/CMakeLists.txt", std::ios::in);
+        std::ifstream infile(project_path + "src/CMakeLists.txt", std::ios::in);
         if (!infile) {
             std::cerr << "Could not open the secondaries CMakeLists.txt files (inside src and test folders)\n";
-            return;
+            return false;
         }
         std::getline(infile, line);
         std::string project_name = line.substr(line.find("(")+1, line.length()-1);
         project_name = project_name.substr(0, project_name.find(")"));
         infile.close();
 
-        std::ofstream outfile("dependencies.bscxx");
+        if(project_name.length() == 0){
+            return false;
+        }
+
+        std::ofstream outfile(project_path + "dependencies.bscxx");
         std::string body;
         body = "BSCXX_PROJECT:\n";
         body += "\t[" + project_name + "]:^1.0.0\t|\t" + project_url + "\n\n";
         body += "BSCXX_DEPENDENCIES:\n";
-        for(const auto& p : std::experimental::filesystem::v1::directory_iterator("bscxx_modules")){
+        for(const auto& p : std::experimental::filesystem::v1::directory_iterator(project_path + "bscxx_modules")){
             std::string module_path = p.path().string();
             std::string line_module;
             std::ifstream infile_module(module_path + "/dependencies.bscxx", std::ios::in);
@@ -423,7 +465,12 @@ namespace core{
             infile_module.close();
         }
         outfile << body;
-        outfile.close();      
+        outfile.close();
+
+        if(!std::experimental::filesystem::v1::exists(project_path + "dependencies.bscxx")){
+            return false;
+        }
+        return true;      
     }
 
     inline bool UpdateGitUrlProject(){
