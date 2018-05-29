@@ -21,6 +21,10 @@ int main(int argc, char* argv[]){
                         << "\n";
                 }
                 
+                /*****************************/
+                /* If creating a new project */
+                /*****************************/ 
+
                 else{
                     core::InitializeGit();
                     core::CreateMainCmakeListsFile("./");
@@ -52,8 +56,7 @@ int main(int argc, char* argv[]){
                 /***********/ 
                 std::cout 
                     << "\nError: project name can't be empty"
-                    << "\n\nUsage: bscxx create [project_name]"
-                    << "\n";
+                    << "\n\nUsage: bscxx create [project_name]\n";
             }
         }
 
