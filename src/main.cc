@@ -117,6 +117,7 @@ int main(int argc, char* argv[]){
                 /*****************************/
                 else if(strcmp(argv[2], "--github") == 0){
                     if(argv[3] != nullptr){
+                        
                         /*************************/
                         /* Show the help command */
                         /*************************/
@@ -127,7 +128,12 @@ int main(int argc, char* argv[]){
                                 << " the github_path is \"Elkantor/bscxx\".\n"
                                 << "\n\nUsage: bscxx add --github [github_path]"
                                 << "\n";
-                        }else{
+                        }
+
+                        /*************************/
+                        /* Add the github module */
+                        /*************************/
+                        else{
                             std::string module_name;
                             core::CreateFolder("bscxx_modules");
                             if(!core::AddGithubModule(argv[3], "bscxx_modules/", &module_name)){
