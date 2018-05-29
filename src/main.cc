@@ -82,42 +82,12 @@ int main(int argc, char* argv[]){
                         << "\n";
                 }
 
-                // /****************************/
-                // /* If creating a new module */
-                // /****************************/
-                // else if(strcmp(argv[2], "--new") == 0 || strcmp(argv[2], "-n") == 0){
-                //     /*************************/
-                //     /* Show the help command */
-                //     /*************************/
-                //     if(strcmp(argv[3], "-h") == 0 || strcmp(argv[3], "--help") == 0){
-                //         std::cout 
-                //             << "\nCreate a new skeleton of a C++ module in the project's dependencies (located in ./bscxx_modules)"
-                //             << "\n\nUsage: bscxx add --new [module_name]"
-                //             << "\n";
-                //     }
-                //     core::CreateFolder("bscxx_modules");
-                //     core::CreateFolder("bscxx_modules/" + module_name);
-                //     core::CreateMainCmakeListsFile("./bscxx_modules/" + module_name + "/");
-                //     core::CreateFolder("bscxx_modules/" + module_name + "/src");
-                //     core::CreateFolder("bscxx_modules/" + module_name + "/include");
-                //     core::CreateSubdirectoryIncludeFolder("bscxx_modules/" + module_name);
-                //     core::CreateFolder("bscxx_modules/" + module_name + "/test");
-                //     core::CreateMainFile("bscxx_modules/" + module_name + "/src");
-                //     core::CreateTestMainFile("bscxx_modules/" + module_name + "/test");
-                //     core::CreateSecondaryCMakeListsFile("bscxx_modules/" + module_name + "/src", module_name);
-                //     core::CreateSecondaryCMakeListsFile("bscxx_modules/" + module_name + "/test", module_name);
-                //     core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
-                //     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
-                //     core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
-                //     core::UpdateDependenciesFile();
-                // }
-
                 /*****************************/
                 /* If adding a github module */
                 /*****************************/
                 else if(strcmp(argv[2], "--github") == 0){
                     if(argv[3] != nullptr){
-                        
+
                         /*************************/
                         /* Show the help command */
                         /*************************/
