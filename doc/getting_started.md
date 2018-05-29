@@ -34,7 +34,7 @@ Actually, there is a default "main.cc" file inside the src folder, created by de
 So your project is already ready to be built.
 
 <blockquote>
-<p><g-emoji class="g-emoji" alias="bulb" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png" ios-version="6.0"><img class="emoji" alt="bulb" height="20" width="20" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png"></g-emoji> [Note] bscxx initialize a git repository when creating a new project, and add a .gitignore with the "build" folder listed. In the next step, if you choose to rename the "build" folder whatever you want, don't forget to add it in the gitignore.
+<p><g-emoji class="g-emoji" alias="bulb" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png" ios-version="6.0"><img class="emoji" alt="bulb" height="20" width="20" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png"></g-emoji> [Note] bscxx initializes a git repository when creating a new project, and add a .gitignore with the "build" folder listed. In the next step, if you choose to rename the "build" folder whatever you want, don't forget to add it in the gitignore.
 </p>
 </blockquote>
 
