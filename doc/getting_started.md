@@ -25,7 +25,7 @@ By typing the "ls" command (on Unix) or the "dir" command (on Windows), you shou
 </div>
 
 Here's a quick explaination of all of these folders and files :
-* The main CMakeLists.txt file, to compile your project with CMake, and include all the headers/source files your project will need...
+* The main CMakeLists.txt file, to generate your project with CMake, and include all the headers/source files your project will need...
 * The "bscxx_module" folder, which will contain all your modules dependencies (just like node_modules with npm for instance).
 * The dependencies.bscxx file, which contains the list of the project's dependencies. You just need this file to install your module. It's really similar to the "package.json" or to the "composer.json" files for npm or composer packages managers.
 * And finally, the default "classic" structure of your C++ project, with the "include" folder, which contains all your header files, the "src" folder, which contains your source files, and the "test" folder, which will contain all your C++ files needed for your unit tests.
