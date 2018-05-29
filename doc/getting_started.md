@@ -1,9 +1,9 @@
 # Getting Started
-> Here are the first steps to begin tu use bscxx as a C++ package manager
+> Here are the first steps to begin to use bscxx as a C++ package manager
 
 ## Create a new project
 
-The first thing you want to do, when creating a new project, is actually creating the structure of your new C++ project.
+The first thing you want to do, when creating a new project, is actually to create the structure of your new C++ project.
 If you often create new projects, you know that can be redundant and a bit borring. So why not make it fully automaticly by using one command ?
 
 First, go where you want to create your project, and create a new folder for it.
