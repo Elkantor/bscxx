@@ -19,7 +19,7 @@ In my case, my project is named "new_project"
 bscxx create new_project
 ```
 
-You should see a structure which looks like this:
+By typing the "ls" command (on Unix) or the "dir" command (on Windows), you should see a structure which looks like this:
 <div style="position:absolute; width:100%; height:100%">
   <img src="http://gamedevpex.com/bscxx/bscxx_structure.png"/>
 </div>
