@@ -4,7 +4,7 @@
 ## Create a new project
 
 The first thing you want to do, when creating a new project, is actually to create the structure of your new C++ project.
-If you often create new projects, you know that can be redundant and a bit borring. So why not make it fully automaticly by using one command ?
+If you often create new projects, you know that can be redundant and a bit borring. So why not generate it automaticly, just by using one command ?
 
 First, go where you want to create your project, and create a new folder for it.
 ```shell
