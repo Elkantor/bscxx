@@ -8,9 +8,9 @@ If you often create new projects, you know that can be redundant and a bit borri
 
 First, go where you want to create your project, and create a new folder for it.
 
-*For example, for me, it's inside my C:\Users\V_Gallet\Documents\ folder*
+*For example, for me, it's inside my C:\Users\V_GALLET\Documents\ folder*
 ```shell
-cd path_to_projects && mkdir new_project
+cd C:\Users\V_GALLET\Documents && mkdir new_project
 ```
 
 Then, create the structure of your new project, with everything you need to begin.
