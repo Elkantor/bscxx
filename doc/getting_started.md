@@ -33,6 +33,11 @@ Here's a quick explaination of all of these folders and files :
 Actually, there is a default "main.cc" file inside the src folder, created by default (just like the "test.cc" file inside the "test" folder).
 So your project is already ready to be built.
 
+<blockquote>
+<p><g-emoji class="g-emoji" alias="bulb" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png" ios-version="6.0"><img class="emoji" alt="bulb" height="20" width="20" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png"></g-emoji> [Note] bscxx initialize a git repository when creating a new project, and add a .gitignore with the "build" folder listed. In the next step, if you choose to rename the "build" folder whatever you want, don't forget to add it in the gitignore.
+</p>
+</blockquote>
+
 Create a new folder named "build" and go inside.
 ```shell
 mkdir build && cd build
