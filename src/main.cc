@@ -176,6 +176,25 @@ int main(int argc, char* argv[]){
             core::UpdateGitUrlProject();
         }
 
+        /*****************************************/
+        /* Show the tree of modules dependencies */
+        /*****************************************/
+        else if(strcmp(argv[1], "tree") == 0){
+            /***********************************/
+            /* If it's in the project's folder */
+            /***********************************/
+            if(argv[2] == nullptr){
+                core::ShowTreeDependenciesModule(".");
+            }
+
+            /*********************************/
+            /* If it's for a specific module */
+            /*********************************/
+            else{
+                core::ShowTreeDependenciesModule(argv[2]);
+            }
+        }
+
         /**************************************************/
         /* Remove a package from the project dependencies */
         /**************************************************/

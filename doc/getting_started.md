@@ -43,7 +43,7 @@ Create a new folder named "build" and go inside.
 mkdir build && cd build
 ```
 
-With the help of CMake, generate the project file (with whatever generator you want, here, I'll keep it simple, by using the default one, which is Visual Studio 2017 for example, for me).
+With the help of CMake, generate the project files (with whatever generator you want, here, I'll keep it simple, by using the default one, which is Visual Studio 2017 for example, for me on Windows).
 ```shell
 cmake ..
 ```
@@ -53,7 +53,7 @@ Everything should be fine, and you can now build this default project, with the 
 cmake --build . --config Release
 ```
 
-Once again, everything should compile just fine. Which means you can actuelly start launch the executable file (.exe on windows, without ".exe" part on linux).
+Once again, everything should compile just fine. Which means you can actually start to launch the executable file (.exe on windows, without ".exe" part on linux).
 ```shell
 "src/bin/release/new_project.exe"
 ```

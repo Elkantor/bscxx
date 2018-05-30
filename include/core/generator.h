@@ -4,6 +4,22 @@
 
 namespace core{
 
+    /**************/
+    /* STRUCTURES */
+    /**************/
+    struct Module{
+        friend bool operator< (const Module& left, const Module& right);
+        std::set<Module> dependencies;
+        std::set<Module> parent_modules;
+        std::string name;
+        std::string path;
+        std::string url;
+    };
+
+    bool operator< (const Module& left, const Module& right){
+        return left.name != right.name;
+    }
+
     /*********/
     /* ENUMS */
     /*********/
@@ -813,6 +829,83 @@ namespace core{
                 std::cout << "Module correclty added, project updated.\n";
             }
         }
+        return true;
+    }
+
+    inline bool ShowTreeDependenciesModule(const std::string& project_path = "."){
+        std::string project_name;
+        GetProjectName(&project_name, project_path);
+        std::cout << "\n" << project_name << "\n";
+
+        std::set<Module> modules;
+        for(const auto& p : std::experimental::filesystem::v1::directory_iterator(project_path + "/bscxx_modules")){
+            Module module;
+            module.path = p.path().string();
+            if(!GetProjectName(&module.name, module.path)){
+                std::cerr << "\nCould not get the name of the module inside " + module.path + "\n";
+                return false;
+            }
+            std::string line;
+            std::ifstream infile(module.path + "/dependencies.bscxx", std::ios::in);
+            if (!infile) {
+                std::cerr << "\nCould not open the dependencies.bscxx file inside " + module.path + "/dependencies.bscxx\n";
+                return false;
+            }
+
+            bool module_lines = false;
+            while(!infile.eof()){
+                std::getline(infile, line);
+                if(module_lines){
+                    size_t pos_separator = line.find("]");
+                    if(pos_separator != std::string::npos){
+                        Module dependency;
+                        dependency.name = line.substr(2, pos_separator - 2);
+                        dependency.parent_modules.insert(module);
+                        module.dependencies.insert(dependency);
+                        modules.insert(module);
+                        modules.insert(dependency);
+                    }
+                }
+                if(line.compare("BSCXX_DEPENDENCIES:") == 0){
+                    module_lines = true;
+                }
+            }
+            infile.close();
+            modules.insert(module);
+        }
+
+        std::function<void(std::set<Module>& modules, bool show_module, int current_depth)> show_outputs_results;
+        show_outputs_results = [&](std::set<Module>& modules, bool show_module, int current_depth){
+            std::for_each(modules.begin(), modules.end(), [&](const Module& module){ 
+                if(module.dependencies.size() == 0 && module.parent_modules.size() == 0){
+                    std::cout << "|--" << module.name << "\n";
+                    return;
+                }
+                if(module.dependencies.size() > 0 && module.parent_modules.size() == 0){
+                    std::cout << "|--" << module.name << "\n";
+                    std::set<Module> dependencies;
+                    dependencies.insert(module.dependencies.begin(), module.dependencies.end());
+                    show_outputs_results(dependencies, true, current_depth++);
+                }else{
+                    if(show_module){
+                        std::string spaces = "   ";
+                        for(int i = 0; i < current_depth; i++){
+                            spaces += "   ";
+                        }
+                        std::cout << spaces << "|--" << module.name << "\n";
+                        if(module.dependencies.size() > 0){
+                            std::set<Module> dependencies;
+                            dependencies.insert(module.dependencies.begin(), module.dependencies.end());
+                            show_outputs_results(dependencies, true, current_depth++);
+                        }
+                    }
+                }
+            });
+        };
+
+        show_outputs_results(modules, false, 0);
+        
+
         return true;
     }
 

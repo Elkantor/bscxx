@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
+#include <set>
 #include <thread>
 #include <algorithm>
 #include <experimental/filesystem>
