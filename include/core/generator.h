@@ -8,17 +8,15 @@ namespace core{
     /* STRUCTURES */
     /**************/
     struct Module{
-        friend bool operator< (const Module& left, const Module& right);
         std::set<Module> dependencies;
         std::set<Module> parent_modules;
         std::string name;
         std::string path;
         std::string url;
+        bool operator<(const Module& m1) const{
+            return name < m1.name;
+        }
     };
-
-    bool operator< (const Module& left, const Module& right){
-        return left.name != right.name;
-    }
 
     /*********/
     /* ENUMS */
@@ -765,7 +763,7 @@ namespace core{
         std::cout << "Adding " + project_name + " module..." << std::endl;
         CreateFolder(modules_folder + project_name);
         std::experimental::filesystem::v1::copy(module_path, modules_folder + project_name, std::experimental::filesystem::v1::copy_options::recursive);
-        AddDependencyUrlToModule(modules_folder + project_name, "local_module");
+        AddDependencyUrlToModule(modules_folder + project_name, module_path);
         CreateSubdirectoryIncludeFolder(modules_folder + project_name);
         MoveSubModulesToMainBSCXXDirectory(modules_folder + project_name);
         return true;
@@ -832,80 +830,140 @@ namespace core{
         return true;
     }
 
-    inline bool ShowTreeDependenciesModule(const std::string& project_path = "."){
-        std::string project_name;
-        GetProjectName(&project_name, project_path);
-        std::cout << "\n" << project_name << "\n";
+    inline bool GetIncludeModulesInHeaders(std::set<Module>& modules, Module* out_module){
+        for(auto& p : std::experimental::filesystem::v1::recursive_directory_iterator(out_module->path + "/include")){
+            std::string file_name = p.path().string();
+            std::string extension_file = p.path().string().substr(file_name.find_last_of(".") + 1);
+            if(extension_file == "h" || extension_file == "hpp"){
+                std::string line;
+                std::ifstream infile(file_name, std::ios::in);
+                if (!infile) {
+                    std::cerr << "Could not open the header files of the " + out_module->name + " module.\n";
+                    return false;
+                }
+                while(!infile.eof()){
+                    std::getline(infile, line);
+                    std::size_t found_header;
+                    found_header = line.find("#include");
+                    if(found_header != std::string::npos){
+                        std::for_each(modules.begin(), modules.end(), [&](const Module& m){
+                            std::size_t found_include_file;
+                            std::string include_name = "<" + m.name + "/";
+                            found_include_file = line.find(include_name);
+                            if(found_include_file != std::string::npos){
+                                if(out_module->name.compare(m.name) != 0){
+                                    out_module->dependencies.insert(m);
+                                }
+                            }else{
+                                include_name = "\"" + m.name + "/";
+                                found_include_file = line.find(include_name);
+                                if(found_include_file != std::string::npos){
+                                    if(out_module->name.compare(m.name) != 0){
+                                        out_module->dependencies.insert(m);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                infile.close();
+            }
+        }
+        return true;
+    }
 
-        std::set<Module> modules;
+    inline bool GetIncludeModulesInSourceFiles(std::set<Module>& modules, Module* out_module){ 
+        for(auto& p : std::experimental::filesystem::v1::recursive_directory_iterator(out_module->path + "/src")){
+            std::string file_name = p.path().string();
+            std::string extension_file = p.path().string().substr(file_name.find_last_of(".") + 1);
+            if(extension_file == "cc" || extension_file == "cpp" || extension_file == "cxx" || extension_file == "c"){
+                std::string line;
+                std::ifstream infile(file_name, std::ios::in);
+                if (!infile) {
+                    std::cerr << "Could not open the source files of the " + out_module->name + " module.\n";
+                    return false;
+                }
+                while(!infile.eof()){
+                    std::getline(infile, line);
+                    std::size_t found_header;
+                    found_header = line.find("#include");
+                    if(found_header != std::string::npos){
+                        std::for_each(modules.begin(), modules.end(), [&](const Module& m){
+                            std::size_t found_include_file;
+                            std::string include_name = "<" + m.name + "/";
+                            found_include_file = line.find(include_name);
+                            if(found_include_file != std::string::npos){
+                                if(out_module->name.compare(m.name) != 0){
+                                    out_module->dependencies.insert(m);
+                                }
+                            }else{
+                                include_name = "\"" + m.name + "/";
+                                found_include_file = line.find(include_name);
+                                if(found_include_file != std::string::npos){
+                                    if(out_module->name.compare(m.name) != 0){
+                                        out_module->dependencies.insert(m);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                infile.close();
+            }
+        }
+        return true;
+    }
+
+    inline bool ShowTreeDependenciesModule(
+        const std::string& project_path = ".",
+        const bool module_dependency = false
+    ){
+        std::set<Module> all_modules;
+
+        Module main_module;
+        main_module.path = project_path;
+        GetProjectName(&main_module.name, project_path);
+        all_modules.insert(main_module);
+
         for(const auto& p : std::experimental::filesystem::v1::directory_iterator(project_path + "/bscxx_modules")){
             Module module;
             module.path = p.path().string();
-            if(!GetProjectName(&module.name, module.path)){
-                std::cerr << "\nCould not get the name of the module inside " + module.path + "\n";
-                return false;
-            }
-            std::string line;
-            std::ifstream infile(module.path + "/dependencies.bscxx", std::ios::in);
-            if (!infile) {
-                std::cerr << "\nCould not open the dependencies.bscxx file inside " + module.path + "/dependencies.bscxx\n";
-                return false;
-            }
-
-            bool module_lines = false;
-            while(!infile.eof()){
-                std::getline(infile, line);
-                if(module_lines){
-                    size_t pos_separator = line.find("]");
-                    if(pos_separator != std::string::npos){
-                        Module dependency;
-                        dependency.name = line.substr(2, pos_separator - 2);
-                        dependency.parent_modules.insert(module);
-                        module.dependencies.insert(dependency);
-                        modules.insert(module);
-                        modules.insert(dependency);
-                    }
-                }
-                if(line.compare("BSCXX_DEPENDENCIES:") == 0){
-                    module_lines = true;
-                }
-            }
-            infile.close();
-            modules.insert(module);
+            GetProjectName(&module.name, module.path);
+            all_modules.insert(module);
         }
 
-        std::function<void(std::set<Module>& modules, bool show_module, int current_depth)> show_outputs_results;
-        show_outputs_results = [&](std::set<Module>& modules, bool show_module, int current_depth){
-            std::for_each(modules.begin(), modules.end(), [&](const Module& module){ 
-                if(module.dependencies.size() == 0 && module.parent_modules.size() == 0){
-                    std::cout << "|--" << module.name << "\n";
-                    return;
+        for(const auto& m : all_modules){
+            const Module& const_m = m;
+            Module& m2 = const_cast<Module&>(m);
+            std::thread dependencies_headers(GetIncludeModulesInHeaders, all_modules, &m2);
+            std::thread dependencies_source_files(GetIncludeModulesInSourceFiles, all_modules, &m2);
+            dependencies_headers.join();
+            dependencies_source_files.join();
+        }
+
+        std::function<void(const std::set<Module>& modules, int current_depth)> show_outputs_results;
+        show_outputs_results = [&](const std::set<Module>& modules, int current_depth){
+            std::for_each(modules.begin(), modules.end(), [&](const Module& module){
+                std::string spaces = "   ";
+                for(int i = 0; i < current_depth; i++){
+                    spaces += "   ";
                 }
-                if(module.dependencies.size() > 0 && module.parent_modules.size() == 0){
-                    std::cout << "|--" << module.name << "\n";
-                    std::set<Module> dependencies;
-                    dependencies.insert(module.dependencies.begin(), module.dependencies.end());
-                    show_outputs_results(dependencies, true, current_depth++);
-                }else{
-                    if(show_module){
-                        std::string spaces = "   ";
-                        for(int i = 0; i < current_depth; i++){
-                            spaces += "   ";
-                        }
-                        std::cout << spaces << "|--" << module.name << "\n";
-                        if(module.dependencies.size() > 0){
-                            std::set<Module> dependencies;
-                            dependencies.insert(module.dependencies.begin(), module.dependencies.end());
-                            show_outputs_results(dependencies, true, current_depth++);
-                        }
+                std::cout << spaces << "|--" << module.name << "\n";
+                if(module.dependencies.size() > 0){
+                    std::set<Module>::iterator it = all_modules.find(module);
+                    if(it != all_modules.end()){
+                        int new_depth = current_depth;
+                        new_depth++;
+                        show_outputs_results(it->dependencies, new_depth);
                     }
                 }
             });
         };
-
-        show_outputs_results(modules, false, 0);
-        
-
+        std::cout << main_module.name << "\n";
+        std::set<Module>::iterator it = all_modules.find(main_module);
+        if(it->dependencies.size() > 0){
+            show_outputs_results(it->dependencies, 0);
+        }
         return true;
     }
 
