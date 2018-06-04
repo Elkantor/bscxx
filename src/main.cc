@@ -195,9 +195,9 @@ int main(int argc, char* argv[]){
             }
         }
 
-        /*****************************************/
-        /* Show the list of packages (green when they are used, else red) */
-        /*****************************************/
+        /*****************************/
+        /* Show the list of packages */
+        /*****************************/
         else if(strcmp(argv[1], "list") == 0){
             /***********************************/
             /* If it's in the project's folder */

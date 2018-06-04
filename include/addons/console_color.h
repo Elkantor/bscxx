@@ -8,7 +8,6 @@
 #endif
 
 
-
 inline std::ostream& blue(std::ostream &s)
 {
     #if defined(_WIN32)
