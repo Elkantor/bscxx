@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/common.h>
+#include <addons/console_color.h>
 
 namespace core{
 
@@ -959,10 +960,76 @@ namespace core{
                 }
             });
         };
-        std::cout << main_module.name << "\n";
+        std::cout << "\n" << main_module.name << "\n";
         std::set<Module>::iterator it = all_modules.find(main_module);
         if(it->dependencies.size() > 0){
             show_outputs_results(it->dependencies, 0);
+        }
+        return true;
+    }
+
+    inline bool ShowListDependenciesModules(const std::string& project_path = "."){
+        std::set<Module> all_modules;
+
+        Module main_module;
+        main_module.path = project_path;
+        GetProjectName(&main_module.name, project_path);
+        std::cout << "\n[Help]\tIn" << green << " green" << white << " (or +): the dependencies used in this project." 
+            << "\n\tIn" << red << " red" << white << " (or -): the dependencies unused in this project.\n\n"
+            << "List of modules as dependencies for the " << main_module.name << " project:\n"; 
+        all_modules.insert(main_module);
+
+        for(const auto& p : std::experimental::filesystem::v1::directory_iterator(project_path + "/bscxx_modules")){
+            Module module;
+            module.path = p.path().string();
+            GetProjectName(&module.name, module.path);
+            all_modules.insert(module);
+        }
+
+        for(const auto& m : all_modules){
+            const Module& const_m = m;
+            Module& m2 = const_cast<Module&>(m);
+            std::thread dependencies_headers(GetIncludeModulesInHeaders, all_modules, &m2);
+            std::thread dependencies_source_files(GetIncludeModulesInSourceFiles, all_modules, &m2);
+            dependencies_headers.join();
+            dependencies_source_files.join();
+        }
+
+
+        std::set<Module>::iterator it = all_modules.find(main_module);
+        if(it->dependencies.size() > 0){
+            std::set<Module> dependencies_used;
+            std::function<void(const std::set<Module>& modules)> store_dependencies_used;
+
+            store_dependencies_used = [&](const std::set<Module>& modules){
+                std::for_each(modules.begin(), modules.end(), [&](const Module& module){
+                    dependencies_used.insert(module);
+                    std::set<Module>::iterator it_module = all_modules.find(module);
+                    if(it_module != all_modules.end()){
+                        store_dependencies_used(it_module->dependencies);
+                    }
+                });
+            };
+            store_dependencies_used(it->dependencies);
+
+            for(const auto& m1 : all_modules){
+                bool module_founded = false;
+                if(m1.name == main_module.name){
+                    continue;
+                }
+                for(const auto& m2 : dependencies_used){
+                    if(m1.name == m2.name){
+                        std::cout << green << "  + " << m2.name << "\n";
+                        module_founded = true;
+                        break;
+                    }
+                }
+                if(!module_founded){
+                    std::cout << red << "  - " << m1.name << "\n";
+                }
+            }
+            std::cout << white << "\n" << all_modules.size()-1 << " modules as dependencies in this project.\n"
+                << dependencies_used.size() << " modules as dependencies actually used in this project.\n";
         }
         return true;
     }

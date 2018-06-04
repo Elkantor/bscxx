@@ -195,6 +195,25 @@ int main(int argc, char* argv[]){
             }
         }
 
+        /*****************************************/
+        /* Show the list of packages (green when they are used, else red) */
+        /*****************************************/
+        else if(strcmp(argv[1], "list") == 0){
+            /***********************************/
+            /* If it's in the project's folder */
+            /***********************************/
+            if(argv[2] == nullptr){
+                core::ShowListDependenciesModules(".");
+            }
+
+            /*********************************/
+            /* If it's for a specific module */
+            /*********************************/
+            else{
+                core::ShowListDependenciesModules(argv[2]);
+            }
+        }
+
         /**************************************************/
         /* Remove a package from the project dependencies */
         /**************************************************/
@@ -243,6 +262,8 @@ int main(int argc, char* argv[]){
                 << "\nadd\tAdd a C++ module to the project dependencies"
                 << "\nremove\tRemove a C++ module from the project dependencies"
                 << "\ninstall\tInstall the modules dependencies"
+                << "\ntree\tGenerate the tree of the modules used as dependencies"
+                << "\nlist\tList all the modules installed in this project and show if they are used or not"
                 << "\nupdate\tUpdate the url of this project in the dependencies file (dependencies.bscxx)\n"
                 << "\nSee the help for more details : bscxx [command] --help\n";
         }
@@ -258,6 +279,8 @@ int main(int argc, char* argv[]){
                 << "\nadd\tAdd a C++ module in the project dependencies"
                 << "\nremove\tRemove a C++ module from the project dependencies"
                 << "\ninstall\tInstall the modules dependencies"
+                << "\ntree\tGenerate the tree of the modules used as dependencies"
+                << "\nlist\tList all the modules installed in this project and show if they are used or not"
                 << "\nupdate\tUpdate the url of this project in the dependencies file (dependencies.bscxx)\n"
                 << "\nSee the help for more details : bscxx [command] --help\n";
         }

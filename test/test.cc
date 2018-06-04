@@ -1,7 +1,7 @@
 #include <core/common.h>
 #include <core/generator.h>
 #include <create_project.h>
-#include <console_color.h>
+#include <addons/console_color.h>
 
 int main(int argc, char* argv[]){ 
 

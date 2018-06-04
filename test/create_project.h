@@ -4,7 +4,7 @@
 #include <core/generator.h>
 #include <stdexcept>
 #include <create_project.h>
-#include <console_color.h>
+#include <addons/console_color.h>
 
 namespace test {
 
