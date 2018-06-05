@@ -1,4 +1,7 @@
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) [![Build status](https://ci.appveyor.com/api/projects/status/79o8ckxl0vnq2b85?svg=true)](https://ci.appveyor.com/project/Elkantor/bscxx)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
+[![Standard](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B17)
+[![Build status](https://ci.appveyor.com/api/projects/status/79o8ckxl0vnq2b85?svg=true)](https://ci.appveyor.com/project/Elkantor/bscxx)
 
 
 # bscxx
