@@ -166,14 +166,41 @@ int main(int argc, char* argv[]){
         /* Install the dependencies */
         /****************************/
         else if(strcmp(argv[1], "install") == 0){
-            core::DownloadModules();
+            if(argv[2] != nullptr){
+                /*************************/
+                /* Show the help command */
+                /*************************/
+                if(strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0){
+                    std::cout 
+                        << "\nDownload and add to the project all the modules present in the dependencies.bscxx file."
+                        << "\n\nUsage: bscxx install"
+                        << "\n";
+                }
+            }
+            else{
+                core::DownloadModules();
+            }
         }
 
         /********************************/
         /* Update the dependencies file */
         /********************************/
         else if(strcmp(argv[1], "update") == 0){
-            core::UpdateGitUrlProject();
+            if(argv[2] != nullptr){
+                /*************************/
+                /* Show the help command */
+                /*************************/
+                if(strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0){
+                    std::cout 
+                        << "\nUpdate the git repository url of this project."
+                        << "\n\nUsage: bscxx update"
+                        << "\n";
+                        return 0;
+                }
+            }
+            else{
+                core::UpdateGitUrlProject();
+            }
         }
 
         /*****************************************/
@@ -186,12 +213,23 @@ int main(int argc, char* argv[]){
             if(argv[2] == nullptr){
                 core::ShowTreeDependenciesModule(".");
             }
-
-            /*********************************/
-            /* If it's for a specific module */
-            /*********************************/
             else{
-                core::ShowTreeDependenciesModule(argv[2]);
+                /*************************/
+                /* Show the help command */
+                /*************************/
+                if(strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0){
+                    std::cout 
+                        << "\nGenerate and show a tree of the dependencies used in this project, by scanning your code."
+                        << "\n\nUsage: bscxx tree | bscxx tree [path_bscxx_project]"
+                        << "\n";
+                }
+
+                /*********************************/
+                /* If it's for a specific module */
+                /*********************************/
+                else{
+                    core::ShowTreeDependenciesModule(argv[2]);
+                }
             }
         }
 
@@ -206,11 +244,22 @@ int main(int argc, char* argv[]){
                 core::ShowListDependenciesModules(".");
             }
 
-            /*********************************/
-            /* If it's for a specific module */
-            /*********************************/
             else{
-                core::ShowListDependenciesModules(argv[2]);
+                /*************************/
+                /* Show the help command */
+                /*************************/
+                if(strcmp(argv[2], "-h") == 0 || strcmp(argv[2], "--help") == 0){
+                    std::cout 
+                        << "\nList all the modules installed, and show the used and unused modules, by scanning your code."
+                        << "\n\nUsage: bscxx list | bscxx list [path_to_project]"
+                        << "\n";
+                }
+                /*********************************/
+                /* If it's for a specific module */
+                /*********************************/
+                else{
+                    core::ShowListDependenciesModules(argv[2]);
+                }
             }
         }
 

@@ -721,7 +721,7 @@ namespace core{
 
     inline bool AddGithubModule(const std::string& github_url, const std::string& module_path, std::string* out_module_name){
         std::string final_path_module = module_path + github_url.substr(github_url.find("/")+1, github_url.length()-1);
-        std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + "> null && rm -r null";
+        std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + " > nul";
         system(command.c_str());
         
         if(!std::experimental::filesystem::v1::exists(final_path_module + "/dependencies.bscxx")){
@@ -730,7 +730,6 @@ namespace core{
         RemoveFolder(final_path_module + "/.git");
         std::string module_name;
         GetProjectName(&module_name, final_path_module);
-        std::cout << "Module name: " << module_name + "\n";
         CreateFolder("./bscxx_modules/" + module_name);
         std::experimental::filesystem::v1::copy(final_path_module, "./bscxx_modules/" + module_name, std::experimental::filesystem::v1::copy_options::recursive);
         RemoveFolder(final_path_module);
@@ -816,16 +815,42 @@ namespace core{
         }
         infile.close();
 
+        CreateFolder("bscxx_modules");
+
         for(const auto& s : modules_url){
             if(s.length()-1 > 1){
-                std::string module_url_reduced = s.substr(s.find(".com")+5, s.length()-1);
+                size_t pos_website = s.find("http");
                 std::string module_name;
-                CreateFolder("bscxx_modules");
-                if(!AddGithubModule(module_url_reduced, "bscxx_modules/", &module_name)){
-                    std::cout << "Not a bscxx module repository.\n";
-                    return false;
+                // if it's a module from internet
+                if(pos_website != std::string::npos){
+                    // if it's a github link
+                    if(s.find("github") != std::string::npos){
+                        std::string module_url_reduced = s.substr(s.find(".com")+5, s.length()-1);
+                        if(!AddGithubModule(module_url_reduced, "bscxx_modules/", &module_name)){
+                            std::cout << "Error: the module from " + s + " is not a bscxx module.\n";
+                            continue;
+                        }
+                    }
+                    // if it's a url to a zip folder
+                    else if(s.find(".zip") != std::string::npos){
+                        if(!core::AddZipModule(s, "bscxx_modules/", &module_name)){
+                            std::cout << "Error: the module from " + s + " is not a bscxx module.\n";
+                            continue;
+                        }
+                    }
+                    
                 }
-                std::cout << "Module correclty added, project updated.\n";
+                // if it's a local module
+                else{
+                     if(!core::AddLocalModule(s, "./bscxx_modules/", &module_name)){
+                        std::cout << "Error: the module from " + s + " is not a bscxx module.\n";
+                        continue;
+                    }
+                }
+                core::AddModuleHeadersToMainCMakeListsFile("bscxx_modules/" + module_name);
+                core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "src");
+                core::AddModuleSourceFilesToSecondaryCMakeListsFile(module_name, "test");
+                std::cout << "\nModule " + module_name + " correclty installed.\n";
             }
         }
         return true;
