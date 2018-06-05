@@ -19,16 +19,6 @@ namespace core{
         }
     };
 
-    /*********/
-    /* ENUMS */
-    /*********/
-
-    enum ProjectType{
-        EXECUTABLE,
-        DYNAMIC_LIBRARY,
-        STATIC_LIBRARY
-    };
-
     /*************/
     /* FUNCTIONS */
     /*************/
@@ -65,23 +55,12 @@ namespace core{
 
     inline bool CreateSecondaryCMakeListsFile(
         const std::string& path, 
-        const std::string& project_name, 
-        const ProjectType project_type = ProjectType::EXECUTABLE
+        const std::string& project_name
     ){
         std::string type_project;
         std::ofstream outfile(path + "/CMakeLists.txt");
+        type_project = "add_executable (" + project_name + " ${source_files})";
 
-        switch(project_type){
-            case DYNAMIC_LIBRARY:
-                type_project = "add_library (" + project_name + " SHARED ${source_files})";
-                break;
-            case STATIC_LIBRARY:
-                type_project = "add_library (" + project_name + " STATIC ${source_files})";
-                break;
-            default:
-                type_project = "add_executable (" + project_name + " ${source_files})";
-                break;
-        }
         outfile
             << "project(" << project_name << ")"
             << "\n\nset(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_TYPE})"
@@ -720,19 +699,42 @@ namespace core{
     }
 
     inline bool AddGithubModule(const std::string& github_url, const std::string& module_path, std::string* out_module_name){
-        std::string final_path_module = module_path + github_url.substr(github_url.find("/")+1, github_url.length()-1);
-        std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + " > nul";
-        system(command.c_str());
+        std::string final_path_module = module_path + "/tmp_bscxx/" + github_url.substr(github_url.find("/")+1, github_url.length()-1);
+        RemoveFolder(final_path_module);
         
+        std::string command = "git clone http://github.com/" + github_url + " " + final_path_module + " >nul";
+        system(command.c_str());
+
         if(!std::experimental::filesystem::v1::exists(final_path_module + "/dependencies.bscxx")){
+            std::cout << "\nError: not a bscxx module.\n";
+            RemoveFolder(module_path + "/tmp_bscxx");
             return false;
         }
+
         RemoveFolder(final_path_module + "/.git");
         std::string module_name;
         GetProjectName(&module_name, final_path_module);
-        CreateFolder("./bscxx_modules/" + module_name);
+
+        if(std::experimental::filesystem::v1::exists(module_path + "/" + module_name)){
+            std::cout << "\nError: " << module_name << " module already exists.\n"
+                << "Do you want to remove the folder ? [Y / N]\n";
+            std::string answer;
+            std::cin >> answer;
+            std::transform(answer.begin(), answer.end(), answer.begin(), ::toupper);
+            while(answer.compare("Y") != 0 && answer.compare("N") != 0){
+                std::cout << "\nPlease, answer by Y (yes) or N (no)\n";
+                std::cin >> answer;
+                std::transform(answer.begin(), answer.end(), answer.begin(), ::toupper);
+            }
+            if(answer.compare("Y") == 0){
+                RemoveFolder(module_path + "/" + module_name);
+            }else{
+                return false;
+            }
+        }
+
         std::experimental::filesystem::v1::copy(final_path_module, "./bscxx_modules/" + module_name, std::experimental::filesystem::v1::copy_options::recursive);
-        RemoveFolder(final_path_module);
+        RemoveFolder(module_path + "/tmp_bscxx");
         final_path_module = module_path + "/" + module_name;
         AddDependencyUrlToModule(final_path_module, "http://github.com/" + github_url);
         CreateSubdirectoryIncludeFolder(final_path_module);
@@ -1020,10 +1022,9 @@ namespace core{
             dependencies_source_files.join();
         }
 
-
         std::set<Module>::iterator it = all_modules.find(main_module);
+        std::set<Module> dependencies_used;
         if(it->dependencies.size() > 0){
-            std::set<Module> dependencies_used;
             std::function<void(const std::set<Module>& modules)> store_dependencies_used;
 
             store_dependencies_used = [&](const std::set<Module>& modules){
@@ -1055,6 +1056,13 @@ namespace core{
             }
             std::cout << white << "\n" << all_modules.size()-1 << " modules as dependencies in this project.\n"
                 << dependencies_used.size() << " modules as dependencies actually used in this project.\n";
+        }else{
+            for(const auto& m1 : all_modules){
+                if(m1.name == main_module.name){
+                    continue;
+                }
+                std::cout << red << "  - " << m1.name << "\n";
+            }
         }
         return true;
     }
