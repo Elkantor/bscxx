@@ -153,7 +153,7 @@ namespace core{
         return true;
     }
 
-    inline bool RemoveFolder(const std::string& path){
+    bool RemoveFolder(const std::string& path){
         std::experimental::filesystem::v1::path path_to_remove = path;
         std::string command;
         if(std::experimental::filesystem::v1::exists(path_to_remove)){
@@ -177,7 +177,7 @@ namespace core{
         return false;
     }
 
-    inline bool GetProjectName(std::string* out_project_name, const std::string& path_project = "."){
+    bool GetProjectName(std::string* out_project_name, const std::string& path_project = "."){
         std::string line;
         std::ifstream infile(path_project + "/src/CMakeLists.txt", std::ios::in);
         if (!infile) {
@@ -196,7 +196,7 @@ namespace core{
         return false;
     }
 
-    inline bool AddModuleHeadersToMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
+    bool AddModuleHeadersToMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
         std::vector<std::string> lines;
         std::string line;
         std::ifstream infile(main_path + "/CMakeLists.txt", std::ios::in);
@@ -233,7 +233,7 @@ namespace core{
         return true;
     }
 
-    inline bool RemoveModuleHeadersFromMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
+    bool RemoveModuleHeadersFromMainCMakeListsFile(const std::string& path_module, const std::string& main_path = "."){
         std::vector<std::string> lines;
         std::string line;
         std::ifstream infile(main_path + "/CMakeLists.txt", std::ios::in);
@@ -269,7 +269,7 @@ namespace core{
         return true;
     }
 
-    inline bool AddModuleSourceFilesToSecondaryCMakeListsFile(
+    bool AddModuleSourceFilesToSecondaryCMakeListsFile(
         const std::string& module_name, 
         const std::string& source_folder
     ){
@@ -331,7 +331,7 @@ namespace core{
         return true;
     }
 
-    inline void RemoveModuleSourceFilesToSecondaryCmakeListsFile(
+    void RemoveModuleSourceFilesToSecondaryCmakeListsFile(
         const std::string& module_name, 
         const std::string& source_folder
     ){
@@ -384,7 +384,7 @@ namespace core{
         outfile.close();
     }
 
-    inline bool AddDependencyUrlToModule(const std::string& module_path, const std::string& module_url){
+    bool AddDependencyUrlToModule(const std::string& module_path, const std::string& module_url){
         std::vector<std::string> lines;
         std::string line;
         std::ifstream infile("./" + module_path + "/dependencies.bscxx", std::ios::in);
@@ -424,7 +424,7 @@ namespace core{
         return true;
     }
 
-    inline bool UpdateDependenciesFile(const std::string& project_url = "", const std::string& project_path = "./"){
+    bool UpdateDependenciesFile(const std::string& project_url = "", const std::string& project_path = "./"){
         std::string line;
         std::ifstream infile(project_path + "src/CMakeLists.txt", std::ios::in);
         if (!infile) {
@@ -467,7 +467,7 @@ namespace core{
         return true;      
     }
 
-    inline bool UpdateGitUrlProject(){
+    bool UpdateGitUrlProject(){
         std::string git_url_project;
         std::experimental::filesystem::v1::path path_git_directory = ".git";
         if(std::experimental::filesystem::v1::exists(path_git_directory)){
@@ -492,7 +492,7 @@ namespace core{
         return false;
     }
 
-    inline bool AddPrenameToHeaderFiles(
+    bool AddPrenameToHeaderFiles(
         const std::vector<std::string>& include_files,
         const std::string& module_path,
         const std::string& module_name
@@ -538,7 +538,7 @@ namespace core{
         return true;
     }
 
-    inline bool AddPrenameToSourceFiles(
+    bool AddPrenameToSourceFiles(
         const std::vector<std::string>& include_files,
         const std::string& module_path,
         const std::string& module_name
@@ -584,7 +584,7 @@ namespace core{
         return true;
     }
 
-    inline bool ModifyIncludeHeadersSourceFiles(const std::string& module_path, const std::string& module_name){
+    bool ModifyIncludeHeadersSourceFiles(const std::string& module_path, const std::string& module_name){
         std::vector<std::string> include_files;
         for(const auto& p : std::experimental::filesystem::v1::recursive_directory_iterator(module_path + "/include/" + module_name)){
             std::string file_name = p.path().string();
@@ -610,7 +610,7 @@ namespace core{
         return true;
     }
 
-    inline bool CreateSubdirectoryIncludeFolder(const std::string& module_path){
+    bool CreateSubdirectoryIncludeFolder(const std::string& module_path){
         std::string module_name = module_path.substr(module_path.find("/", 14)+1, module_path.length()-1);
         std::string new_include_path = module_path + "/include/" + module_name;
         CreateFolder(module_path + '/' + module_name);
@@ -630,7 +630,7 @@ namespace core{
         return false;
     }
 
-    inline bool MoveSubModulesToMainBSCXXDirectory(const std::string& module_path){
+    bool MoveSubModulesToMainBSCXXDirectory(const std::string& module_path){
         for(const auto& module : std::experimental::filesystem::v1::directory_iterator(module_path + "/bscxx_modules")){
             std::string submodule_name;
             GetProjectName(&submodule_name, module.path().string());
@@ -654,7 +654,7 @@ namespace core{
         return true;
     }
 
-    inline bool AddZipModule(const std::string& url, const std::string& module_path, std::string* out_module_name){
+    bool AddZipModule(const std::string& url, const std::string& module_path, std::string* out_module_name){
         std::string command;
         #if defined(_WIN32)
             command = "(for /f \"delims=\" %a in ('where git') do echo %~dpa > git_location.txt) > nul";
@@ -698,7 +698,7 @@ namespace core{
         return true;
     }
 
-    inline bool AddGithubModule(const std::string& github_url, const std::string& module_path, std::string* out_module_name){
+    bool AddGithubModule(const std::string& github_url, const std::string& module_path, std::string* out_module_name){
         std::string final_path_module = module_path + "/tmp_bscxx/" + github_url.substr(github_url.find("/")+1, github_url.length()-1);
         RemoveFolder(final_path_module);
         
@@ -743,7 +743,7 @@ namespace core{
         return true;
     }
 
-    inline bool AddLocalModule(
+    bool AddLocalModule(
         const std::string& module_path, 
         const std::string& modules_folder,
         std::string* out_module_name
@@ -790,7 +790,7 @@ namespace core{
         return true;
     }
 
-    inline bool DownloadModules(){
+    bool DownloadModules(){
         std::string project_name;
         GetProjectName(&project_name);
 
@@ -858,7 +858,7 @@ namespace core{
         return true;
     }
 
-    inline bool GetIncludeModulesInHeaders(std::set<Module>& modules, Module* out_module){
+    bool GetIncludeModulesInHeaders(std::set<Module>& modules, Module* out_module){
         for(auto& p : std::experimental::filesystem::v1::recursive_directory_iterator(out_module->path + "/include")){
             std::string file_name = p.path().string();
             std::string extension_file = p.path().string().substr(file_name.find_last_of(".") + 1);
@@ -874,6 +874,12 @@ namespace core{
                     std::size_t found_header;
                     found_header = line.find("#include");
                     if(found_header != std::string::npos){
+                        std::string begining_line = line.substr(0, found_header + 1);
+                        // if the include line is not commented
+                        if(begining_line.find("//") != std::string::npos
+                            || begining_line.find("/*") != std::string::npos){
+                                continue;
+                        }
                         std::for_each(modules.begin(), modules.end(), [&](const Module& m){
                             std::size_t found_include_file;
                             std::string include_name = "<" + m.name + "/";
@@ -900,7 +906,7 @@ namespace core{
         return true;
     }
 
-    inline bool GetIncludeModulesInSourceFiles(std::set<Module>& modules, Module* out_module){ 
+    bool GetIncludeModulesInSourceFiles(std::set<Module>& modules, Module* out_module){ 
         for(auto& p : std::experimental::filesystem::v1::recursive_directory_iterator(out_module->path + "/src")){
             std::string file_name = p.path().string();
             std::string extension_file = p.path().string().substr(file_name.find_last_of(".") + 1);
@@ -916,6 +922,12 @@ namespace core{
                     std::size_t found_header;
                     found_header = line.find("#include");
                     if(found_header != std::string::npos){
+                        std::string begining_line = line.substr(0, found_header + 1);
+                        // if the include line is not commented
+                        if(begining_line.find("//") != std::string::npos
+                            || begining_line.find("/*") != std::string::npos){
+                                continue;
+                        }
                         std::for_each(modules.begin(), modules.end(), [&](const Module& m){
                             std::size_t found_include_file;
                             std::string include_name = "<" + m.name + "/";
@@ -942,7 +954,7 @@ namespace core{
         return true;
     }
 
-    inline bool ShowTreeDependenciesModule(
+    bool ShowTreeDependenciesModule(
         const std::string& project_path = ".",
         const bool module_dependency = false
     ){
@@ -995,7 +1007,7 @@ namespace core{
         return true;
     }
 
-    inline bool ShowListDependenciesModules(const std::string& project_path = "."){
+    bool ShowListDependenciesModules(const std::string& project_path = "."){
         std::set<Module> all_modules;
 
         Module main_module;
