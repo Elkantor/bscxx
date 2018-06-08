@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
     /***********************************************/
     /* Test to build & run the default application */
     /***********************************************/
-    if(!test::BuildAndRunDefaultProject("abc", &test_passed)){
+    if(!test::BuildAndRunDefaultProject("abc", &tests_passed)){
         std::cout << red << "Error when building and running the default project.\n";
         return EXIT_FAILURE;
     }
