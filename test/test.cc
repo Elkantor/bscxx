@@ -28,7 +28,8 @@ int main(int argc, char* argv[]){
         command = "mkdir build && cd build ";
         command += " && cmake ..";
         command += " && cmake --build . --config Release";
-        comand += " && \"src/bin/release/abc.exe\"";
+        command += " && \"src/bin/release/abc.exe\"";
+        command += " && cd ..";
         system(command.c_str());
     }catch(int e){
         return EXIT_FAILURE;
