@@ -12,42 +12,19 @@ int main(int argc, char* argv[]){
     /* Test the creation of a new project */
     /**************************************/ 
     if(!test::CreateDefaultProject("abc", &tests_passed)){
-        std::cout << green << "\n-- " << tests_passed << " tests passed. --" << white << "\n";
         std::cout << red << "Error when creating the default project structure.\n";
         return EXIT_FAILURE;
-    }else{
-        std::cout << green << "\n-- " << tests_passed << " tests passed. --" << white << "\n";
     }
-    /**************************************/
 
-    /***************************************/
+    /***********************************************/
     /* Test to build & run the default application */
-    /***************************************/
-    try{
-        std::string command;
-        command = "cd abc && mkdir build && cd build ";
-        command += " && cmake ..";
-        command += " && cmake --build . --config Release";
-        command += " && \"src/bin/release/abc.exe\" > log_project.txt";
-        command += " && cd ../..";
-        system(command.c_str());
-
-        std::string line;
-        std::string body;
-        std::ifstream infile("abc/build/log_project.txt", std::ios::in);
-        if (!infile) {
-            std::cerr << red << "Error when trying to open the log_project.txt file.\n";
-            return EXIT_FAILURE;
-        }
-        while(!infile.eof()){
-            std::getline(infile, line);
-            body += line;
-        }
-        infile.close();
-        std::cout << "\n" << body << "\n";
-    }catch(int e){
+    /***********************************************/
+    if(!test::BuildAndRunDefaultProject("abc", &test_passed)){
+        std::cout << red << "Error when building and running the default project.\n";
         return EXIT_FAILURE;
     }
+
+    std::cout << green << "\n-- " << tests_passed << " tests passed. --" << white << "\n";
 
     return 0;
 }
