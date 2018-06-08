@@ -25,16 +25,16 @@ int main(int argc, char* argv[]){
     /***************************************/
     try{
         std::string command;
-        command = "mkdir build && cd build ";
+        command = "cd abc && mkdir build && cd build ";
         command += " && cmake ..";
         command += " && cmake --build . --config Release";
         command += " && \"src/bin/release/abc.exe\" > log_project.txt";
-        command += " && cd ..";
+        command += " && cd ../..";
         system(command.c_str());
 
         std::string line;
         std::string body;
-        std::ifstream infile("build/log_project.txt", std::ios::in);
+        std::ifstream infile("abc/build/log_project.txt", std::ios::in);
         if (!infile) {
             std::cerr << red << "Error when trying to open the log_project.txt file.\n";
             return EXIT_FAILURE;
