@@ -34,7 +34,7 @@ int main(int argc, char* argv[]){
 
         std::string line;
         std::string body;
-        std::ifstream infile("log_project.txt", std::ios::in);
+        std::ifstream infile("build/log_project.txt", std::ios::in);
         if (!infile) {
             std::cerr << red << "Error when trying to open the log_project.txt file.\n";
             return EXIT_FAILURE;
