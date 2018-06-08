@@ -29,7 +29,6 @@ int main(int argc, char* argv[]){
         command += " && cmake ..";
         command += " && cmake --build . --config Release";
         comand += " && \"src/bin/release/abc.exe\"";
-        comand += " && cd ..";
         system(command.c_str());
     }catch(int e){
         return EXIT_FAILURE;
