@@ -20,6 +20,20 @@ int main(int argc, char* argv[]){
     }
     /**************************************/
 
+    /***************************************/
+    /* Test to build & run the default application */
+    /***************************************/
+    try{
+        std::string command;
+        command = "mkdir build && cd build ";
+        command += " && cmake ..";
+        command += " && cmake --build . --config Release";
+        comand += " && \"src/bin/release/abc.exe\"";
+        comand += " && cd ..";
+        system(command.c_str());
+    }catch(int e){
+        return EXIT_FAILURE;
+    }
 
     return 0;
 }
