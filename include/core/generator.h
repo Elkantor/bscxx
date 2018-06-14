@@ -94,6 +94,12 @@ namespace core{
             << "\n\t\tIF(${item} MATCHES \"main.cc\")"
             << "\n\t\t\tLIST(REMOVE_ITEM testing_source_files ${item})"
             << "\n\t\tENDIF(${item} MATCHES \"main.cc\")"
+            << "\n\t\tIF(${item} MATCHES \"main.c\")"
+            << "\n\t\t\tLIST(REMOVE_ITEM testing_source_files ${item})"
+            << "\n\t\tENDIF(${item} MATCHES \"main.c\")"
+            << "\n\t\tIF(${item} MATCHES \"main.cpp\")"
+            << "\n\t\t\tLIST(REMOVE_ITEM testing_source_files ${item})"
+            << "\n\t\tENDIF(${item} MATCHES \"main.cpp\")"
             << "\n\tENDFOREACH(item)"
             << "\n## End of removing main.cc files of modules ##"
             << "\n\n## Add executables ##"
@@ -296,6 +302,12 @@ namespace core{
                         lines.emplace_back("\t\tIF(${item} MATCHES \"main.cc\")");
                         lines.emplace_back("\t\t\tLIST(REMOVE_ITEM " + module_name + "_source_files ${item})");
                         lines.emplace_back("\t\tENDIF(${item} MATCHES \"main.cc\")");
+                        lines.emplace_back("\t\tIF(${item} MATCHES \"main.c\")");
+                        lines.emplace_back("\t\t\tLIST(REMOVE_ITEM " + module_name + "_source_files ${item})");
+                        lines.emplace_back("\t\tENDIF(${item} MATCHES \"main.c\")");
+                        lines.emplace_back("\t\tIF(${item} MATCHES \"main.cpp\")");
+                        lines.emplace_back("\t\t\tLIST(REMOVE_ITEM " + module_name + "_source_files ${item})");
+                        lines.emplace_back("\t\tENDIF(${item} MATCHES \"main.cpp\")");
                         lines.emplace_back("\tENDFOREACH(item)");
                     }
                 }
@@ -344,7 +356,7 @@ namespace core{
             return;
         }
 
-        int count_lines_removing_main_file = 5;
+        int count_lines_removing_main_file = 11;
         while(!infile.eof()){
             std::getline(infile, line);
             if(lines.size() > 0){
@@ -353,7 +365,7 @@ namespace core{
                 }
                 if(count_lines_removing_main_file > 0){
                     if(line.compare("\tFOREACH(item ${" + module_name + "_source_files})") == 0 
-                        || count_lines_removing_main_file < 5){
+                        || count_lines_removing_main_file < 11){
                         count_lines_removing_main_file--;
                         continue;
                     }
