@@ -63,7 +63,7 @@ Run this cmake command to create the build system files.
 You can use whatever build system you want like Make, MSVS/Cl... I personnaly prefer using [Ninja](https://ninja-build.org/) when I can. 
 If you don't have Ninja and want to use it, install it first (you can easily install it with *__scoop__* or *__chocolatey__*).
 ```shell
-cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE:STRING=Release
+cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE:STRING=Release && cmake --build .
 ```
 
 And finally, launch the app to test it if everything compiled fine:
